@@ -9,8 +9,17 @@ uint8_t rule[3];
 int autom_eras;
 
 
+// 234 & 245 can get kinda stuck
+
+void print_rules(){  
+  p(rule[0]); p(" , ");
+  p(rule[1]); p(" , ");
+  p(rule[2]); p(" , ");
+  pl();
+}
+
 void random_rules(){
-  rule[0] = random(1,6);
+  rule[0] = random(1,7);
   rule[1] = random(1,6);
   while(rule[0]==rule[1]){
     rule[1] = random(1,6);
@@ -19,11 +28,7 @@ void random_rules(){
   while(rule[2]==rule[0]  || rule[2]==rule[1] ){
     rule[2] = random(1,6);
   }
-
-  p(rule[0]); p(" , ");
-  p(rule[1]); p(" , ");
-  p(rule[2]); p(" , ");
-  pl();
+  // print_rules();
 }
 
 void safe_rules(){
@@ -33,11 +38,7 @@ void safe_rules(){
   while(rule[1]==rule[2]){
     rule[2] = random(2,6);
   }
-  pl("safe");
-  p(rule[0]); p(" , ");
-  p(rule[1]); p(" , ");
-  p(rule[2]); p(" , ");
-  pl();
+  // print_rules();
 }
 
 
@@ -82,8 +83,8 @@ void update_autom(){
 
   for(int l=0;l<NUM_LEDS;l++){
     // Paint
-    if(aut_state[l])    leds[l].setHSV( 0,250, 50);
-    else    leds[l].setHSV( 0,250, 0);
+    if(aut_state[l])    leds[l].setHSV( hue,250, bright);
+    else    leds[l].setHSV( hue,250, 0);
 
 
     // find neighbors + count score
@@ -110,9 +111,7 @@ void update_autom(){
     aut_state[l] = next[l];
     total += next[l];
   }
-  if(total<10){
-    safe_rules();
-  }
+  if(total<=12)   safe_rules();
 }
 
 void automaton(){
