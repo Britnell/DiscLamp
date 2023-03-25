@@ -3,23 +3,20 @@
 
 #include <Arduino.h>
 #include "pattern.h"
-
-#define p(x) Serial.print(x)
-#define pl(x) Serial.println(x)
+#include "lib.h"
 
 String ser_buf = "";
 
 void cmd_line(String str){
-    
     char cmd = str.charAt(0);
     str.remove(0,1);
     if(cmd=='m'){
         mode = str;
-        Serial.print(" m= ");
-        Serial.print(str);
+        p(" m= ");
+        pl(str);
     }
     else 
-    Serial.print(str);
+    pl(str);
 }
 
 void read_serial(){

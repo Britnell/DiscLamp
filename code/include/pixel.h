@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include <FastLED.h>
 
-#define NUM_LEDS  150
+#define NUM_LEDS  151
 #define DATA_PIN   D4
 #define CLOCK_PIN 0
 #define N_ROWS 15

@@ -1,8 +1,8 @@
 #include <Arduino.h>
 #include "pixel.h"
-// #include "connect.h"
-#include "pattern.h"
 #include "serial.h"
+#include "pattern.h"
+#include "automaton.h"
 
 void setup() {
 
@@ -11,16 +11,6 @@ void setup() {
   init_pixel();
   
   demo();
-  leds[62].setRGB(0,0,20);
-  leds[63].setRGB(0,0,20);
-  leds[74].setRGB(0,0,20);
-  leds[75].setRGB(0,0,250);
-  leds[76].setRGB(0,0,20);
-  leds[87].setRGB(0,0,20);
-  leds[88].setRGB(0,0,20);
-  FastLED.show();
-  delay(100);
-
   Serial.println(" ready");
 }
 
@@ -55,12 +45,11 @@ void loop() {
     arrow();
   else if(mode.equals("rain"))
     rain();
-  else if(mode.equals("count"))
-    count();
+  // else if(mode.equals("count"))
+  //   count();
   else if(mode.equals("autom"))
     automaton();
   
   else square();
 
-  // check_server();
 }

@@ -447,42 +447,14 @@ void count(){
 }
 
 
-uint8_t aut_state = 0;
-uint8_t aut_initialised = 0;
-uint8_t aut_A[NUM_LEDS];
-uint8_t aut_B[NUM_LEDS];
-
-void init_automaton(){
-  for(int l=0;l<NUM_LEDS;l++){
-    aut_A[l] = 0;
-    aut_B[l] = 0;
-  }
-  aut_A[61] = 1;
-  aut_A[63] = 1;
-  aut_A[65] = 1;
-  aut_B[86] = 1;
-  aut_B[88] = 1;
-  aut_B[90] = 1;
-}
-
-void automaton(){
-  if(!aut_initialised){
-    init_automaton();
-    aut_initialised = 1;
-  }
-  if(millis()-timer > 1000){
-    timer = millis();
-
-    int val;
-    for(int l=0;l<NUM_LEDS;l++){
-      if(aut_state) val = aut_A[l];
-      else  val = aut_B[l];
-      leds[l].setHSV( hue ,250,  val * 50 );
+int find_pixel(float x, float y){
+  for(uint8_t l=0;l<NUM_LEDS;l++){
+    int d = abs(x - pixel[l].x ) + abs(y-pixel[l].y);
+    if(d<0.3) {
+      return l;
     }
-    FastLED.show();  
-    aut_state = !aut_state;
   }
-  delay(20);
+  return -1;
 }
 
 
