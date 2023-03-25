@@ -5,11 +5,12 @@
 #include "connect.h"
 #include "lib.h"
 
-String MODE = "rain";
+String MODE = "autom";
 unsigned short bright = 100;
 unsigned short hue = 0;
 short invert = 0;
 float f = 0;
+long timer = 0;
 
 // * * *   
 void full(){
@@ -424,10 +425,65 @@ void rain(){
       // particles[r].y = linear(random(0,255),0,255,-6,-8);
     }
   }
+  delay(20);
+}
+
+
+int c = 0;
+void count(){
+
+  int val = 0;
+  for(int l=0;l<NUM_LEDS;l++){
+    if(l > c-5 && l < c+5)
+      val = bright;
+    else val = 0;
+    leds[l].setHSV( hue ,250,  val  );
+  }  
+  c++;
+  if(c>=NUM_LEDS) c = 0;
+
+  FastLED.show();  
 
   delay(20);
 }
 
+
+uint8_t aut_state = 0;
+uint8_t aut_initialised = 0;
+uint8_t aut_A[NUM_LEDS];
+uint8_t aut_B[NUM_LEDS];
+
+void init_automaton(){
+  for(int l=0;l<NUM_LEDS;l++){
+    aut_A[l] = 0;
+    aut_B[l] = 0;
+  }
+  aut_A[61] = 1;
+  aut_A[63] = 1;
+  aut_A[65] = 1;
+  aut_B[86] = 1;
+  aut_B[88] = 1;
+  aut_B[90] = 1;
+}
+
+void automaton(){
+  if(!aut_initialised){
+    init_automaton();
+    aut_initialised = 1;
+  }
+  if(millis()-timer > 800){
+    timer = millis();
+    int val;
+    for(int l=0;l<NUM_LEDS;l++){
+      if(aut_state) val = aut_A[l];
+      else  val = aut_B[l];
+      leds[l].setHSV( hue ,250,  val * 50 );
+    }
+    FastLED.show();  
+    aut_state = !aut_state;
+  }
+  delay(20);
+}
 
 
 void empty(){
@@ -444,3 +500,4 @@ void empty(){
 
 
 #endif
+

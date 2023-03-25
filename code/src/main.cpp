@@ -5,6 +5,7 @@
 
 void setup() {
 
+  Serial.begin(115200);
   init_pixel();
   
   demo();
@@ -18,7 +19,7 @@ void setup() {
   FastLED.show();
   delay(100);
 
-  connect_wifi();
+  // connect_wifi();
   
 }
 
@@ -52,9 +53,12 @@ void loop() {
     arrow();
   else if(MODE.equals("rain"))
     rain();
+  else if(MODE.equals("count"))
+    count();
+  else if(MODE.equals("autom"))
+    automaton();
   
-  else    full();
+  else square();
 
-  check_server();
-  // put your main code here, to run repeatedly:
+  // check_server();
 }

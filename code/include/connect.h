@@ -70,13 +70,12 @@ void connect_wifi(){
     ESP.restart();
   }
   
-//   Serial.begin(115200);
-// Serial.println(WiFi.localIP());
-  
-//   ArduinoOTA.setHostname("LAMP-ESP");
-//   ArduinoOTA.setPassword("admin");
-//   ArduinoOTA.begin();
-  
+  //   Serial.begin(115200);
+  // Serial.println(WiFi.localIP());
+  //   ArduinoOTA.setHostname("LAMP-ESP");
+  //   ArduinoOTA.setPassword("admin");
+  //   ArduinoOTA.begin();
+    
   server.on("/", handleRoot);
   server.on("/set",handleSet);
   server.on("/var",handleVar);
