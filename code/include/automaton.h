@@ -41,11 +41,7 @@ void safe_rules(){
   // print_rules();
 }
 
-
-void init_autom(){
-  autom_eras = 0;
-  safe_rules();
-
+void autom_start(){
   for(int l=0;l<NUM_LEDS;l++){
     aut_state[l] = 0;
   }
@@ -56,6 +52,13 @@ void init_autom(){
   aut_state[76] = 1;
   aut_state[87] = 1;
   aut_state[88] = 1;
+}
+
+void init_autom(){
+  autom_eras = 0;
+  safe_rules();
+
+  autom_start();
 }
 
 
@@ -105,13 +108,15 @@ void update_autom(){
   FastLED.show();  
 
   // Transfer state
-  // check it snot dying out
   int total = 0;
   for(int l=0;l<NUM_LEDS;l++){
     aut_state[l] = next[l];
     total += next[l];
   }
-  if(total<=12)   safe_rules();
+
+  // check it snot dying out
+  if(total==0) autom_start();
+  else if(total<=12)   safe_rules();
 }
 
 void automaton(){
