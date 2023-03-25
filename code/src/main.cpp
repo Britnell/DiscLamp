@@ -3,6 +3,7 @@
 #include "serial.h"
 #include "pattern.h"
 #include "automaton.h"
+#include "rain.h"
 
 void setup() {
 
@@ -17,38 +18,25 @@ void setup() {
 void loop() {
   read_serial();
   
-  if(mode.equals("full"))
-    full();
-  else if(mode.equals("half"))
-    half();
-  else if(mode.equals("line"))
-    line();
-  else if(mode.equals("lines"))
-    lines();
-  else if(mode.equals("hatch"))
-    hatch();
-  else if(mode.equals("hatch2"))
-    hatch2();
-  else if(mode.equals("scroll_lines"))
-    scroll_lines();
-  else if(mode.equals("waves"))
-    perc_a();
-  else if(mode.equals("stripes"))
-    stripes();
-  else if(mode.equals("square"))
-    square();
-  else if(mode.equals("triangle"))
-    triangle();
-  else if(mode.equals("cross"))
-    cross();
-  else if(mode.equals("arrow"))
-    arrow();
-  else if(mode.equals("rain"))
-    rain();
-  // else if(mode.equals("count"))
-  //   count();
-  else if(mode.equals("autom"))
-    automaton();
+  if(mode.equals("full"))   full();
+  else if(mode.equals("half"))    half();
+  else if(mode.equals("square"))    square();
+  else if(mode.equals("triangle"))    triangle();
+  
+  else if(mode.equals("lines"))   lines();
+  else if(mode.equals("hatch"))   hatch();
+  else if(mode.equals("hatch2"))    hatch2();
+  else if(mode.equals("arrow"))   arrow();
+  
+  else if(mode.equals("bar"))    line();
+  else if(mode.equals("stripes"))   stripes();
+
+  else if(mode.equals("scroll"))    scroll_lines();
+  else if(mode.equals("waves"))   perc_a();
+  // else if(mode.equals("cross"))   cross();
+  // else if(mode.equals("count"))    //   count();
+  else if(mode.equals("rain"))    rain();
+  else if(mode.equals("autom"))   automaton();
   
   else square();
 

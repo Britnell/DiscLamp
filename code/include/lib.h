@@ -1,6 +1,6 @@
 #ifndef PIXEL_FUNC
 #define PIXEL_FUNC
-
+#include <Arduino.h>
 
 #define p(x) Serial.print(x)
 #define pl(x) Serial.println(x)

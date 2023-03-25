@@ -6,10 +6,45 @@ uint8_t aut_initialised = 0;
 uint8_t aut_state[NUM_LEDS];
 uint8_t rule[3];
 
-void init_autom(){
+int autom_eras;
+
+
+void random_rules(){
+  rule[0] = random(1,6);
+  rule[1] = random(1,6);
+  while(rule[0]==rule[1]){
+    rule[1] = random(1,6);
+  }
+  rule[2] = random(1,6);
+  while(rule[2]==rule[0]  || rule[2]==rule[1] ){
+    rule[2] = random(1,6);
+  }
+
+  p(rule[0]); p(" , ");
+  p(rule[1]); p(" , ");
+  p(rule[2]); p(" , ");
+  pl();
+}
+
+void safe_rules(){
   rule[0] = 1;
-  rule[1] = 3;
-  rule[2] = 5;
+  rule[1] = random(2,6);
+  rule[2] = random(2,6);
+  while(rule[1]==rule[2]){
+    rule[2] = random(2,6);
+  }
+  pl("safe");
+  p(rule[0]); p(" , ");
+  p(rule[1]); p(" , ");
+  p(rule[2]); p(" , ");
+  pl();
+}
+
+
+void init_autom(){
+  autom_eras = 0;
+  safe_rules();
+
   for(int l=0;l<NUM_LEDS;l++){
     aut_state[l] = 0;
   }
@@ -46,46 +81,53 @@ void update_autom(){
   uint8_t next [NUM_LEDS];
 
   for(int l=0;l<NUM_LEDS;l++){
-    int nbrs[6] = {-1,-1,-1,-1,-1,-1};
-    int score = 0;
-    next[l] = 0;
-
-    // LIGHT UP
+    // Paint
     if(aut_state[l])    leds[l].setHSV( 0,250, 50);
     else    leds[l].setHSV( 0,250, 0);
 
-    // find neighbors +count score
+
+    // find neighbors + count score
+    int nbrs[6] = {-1,-1,-1,-1,-1,-1};
+    int score = 0;
     find_neighbours(pixel[l],nbrs);
     for(int n=0;n<6;n++){
       if(nbrs[n]!=-1)
         score += aut_state[nbrs[n]];
     }
+    // apply rule
+    next[l] = 0;
     if(score>0){
-      // p(" p "); p(l);
-      // p("\t score : "); p(score);
-      if(score==rule[0]  || score==rule[1]  || score==rule[2] ){
+      if(score==rule[0]  || score==rule[1]  || score==rule[2] )
         next[l] = 1;
-      }
     }
   }
+  FastLED.show();  
 
+  // Transfer state
+  // check it snot dying out
   int total = 0;
   for(int l=0;l<NUM_LEDS;l++){
     aut_state[l] = next[l];
     total += next[l];
   }
-  p(" next total is "); pl(total);
-  // check its not dead?
+  if(total<10){
+    safe_rules();
+  }
 }
+
 void automaton(){
   if(!aut_initialised){
     init_autom();
     aut_initialised = 1;
   }
-  if(millis()-timer > 2000){
+  if(millis()-timer > 1600){
     timer = millis();
     update_autom();
-    FastLED.show();  
+
+    if(autom_eras++ ==10){
+      random_rules();
+      autom_eras=0;
+    }
   }
   delay(20);
 }
