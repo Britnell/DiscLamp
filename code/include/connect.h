@@ -48,7 +48,7 @@ void handleSet(){
             bright = server.arg(i).toInt(); 
         }
         else if(server.argName(i).equals("mode")){
-            MODE = server.arg(i); 
+            mode = server.arg(i); 
         }
         else if(server.argName(i).equals("hue")){
             hue = server.arg(i).toInt(); 

@@ -1,11 +1,10 @@
-#ifndef PIXEL_PATTERNS
-#define PIXEL_PATTERNS
+#ifndef PATTERN
+#define PATTERN
 
 #include "pixel.h"
-#include "connect.h"
 #include "lib.h"
 
-String MODE = "autom";
+String mode = "autom";
 unsigned short bright = 100;
 unsigned short hue = 0;
 short invert = 0;
@@ -471,8 +470,9 @@ void automaton(){
     init_automaton();
     aut_initialised = 1;
   }
-  if(millis()-timer > 800){
+  if(millis()-timer > 1000){
     timer = millis();
+
     int val;
     for(int l=0;l<NUM_LEDS;l++){
       if(aut_state) val = aut_A[l];
