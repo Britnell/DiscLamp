@@ -24,11 +24,13 @@ void loop() {
   else if(mode.equals("half"))    half();
   else if(mode.equals("square"))    square();
   else if(mode.equals("triangle"))    triangle();
+  else if(mode.equals("circle"))    circle();
   
   else if(mode.equals("lines"))   lines();
   else if(mode.equals("hatch"))   hatch();
   else if(mode.equals("hatch2"))    hatch2();
   else if(mode.equals("arrow"))   arrow();
+  else if(mode.equals("trif"))   trif();
   
   else if(mode.equals("bar"))    line();
   else if(mode.equals("stripes"))   stripes();

@@ -4,7 +4,7 @@
 #include "pixel.h"
 #include "lib.h"
 
-String mode = "autom";
+String mode = "trif";
 unsigned short bright = 100;
 unsigned short hue = 0;
 short invert = 0;
@@ -125,6 +125,33 @@ void cross(){
 }
 
 
+  float ratio = 0.33;
+  float off = 0;
+  
+void circle(){
+  int lim = 6;
+  int val;
+  for(int l=0;l<NUM_LEDS;l++){
+    float r = sqrt( pixel[l].x*pixel[l].x + pixel[l].y*pixel[l].y );
+    if(r>5) val = 255;
+    else val = 0;
+
+    float col = cos(ratio * PI) * pixel[l].y - pixel[l].x * sin(ratio *PI) + off * lim ;
+    if(col<-lim)col=-lim; else if(col>lim)col=lim;
+
+    int h = int(linear(col, -lim,lim, hue, hue+20 ));
+    // p(l);p(" , ");p(c); p(" , "); pl(val);
+
+    leds[l].setHSV( h ,250,  val );
+  }
+  FastLED.show();
+
+  ratio += 0.1;
+  // if(ratio>1.0) ratio = 0;
+  // pl(ratio);
+  delay(100);
+}
+
 void hatch(){
   for(int l=0;l<NUM_LEDS;l++){
     
@@ -221,6 +248,38 @@ void arrow(){
   }
   FastLED.show();  
 
+  delay(100);
+}
+
+
+uint8_t triforce[45] = {
+  33,34,35,36,37,38,39,40,41,42,
+  46, 47, 48, 49,   51,52,53,54,
+  59,60,61,         64,65,66,
+  72,73,            77,78,
+  85,               90,
+  98, 99, 100, 101, 102,
+  111, 112, 113, 114,
+  123,124,125,
+  134,135,
+  143
+};
+
+void trif(){
+  int val;
+  for(int l=0;l<NUM_LEDS;l++){
+    val = 0;
+    for(int t=0;t<45;t++){
+      if(triforce[t]==l){
+        val = 255;
+        break;
+      }
+      if(triforce[t]>l)
+        break;
+    }
+    leds[l].setHSV( hue ,255,  val );
+  }
+  FastLED.show();
   delay(100);
 }
 
