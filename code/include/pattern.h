@@ -4,7 +4,7 @@
 #include "pixel.h"
 #include "lib.h"
 
-String mode = "zig";
+String mode = "autom";
 unsigned short bright = 100;
 unsigned short hue = 0;
 short invert = 0;
@@ -28,7 +28,7 @@ int find_pixel(float x, float y){
 
 void full(){
   for(int l=0;l<NUM_LEDS;l++){
-      leds[l].setHSV(hue,250, bright);
+      leds[l].setHSV(hue,250, 255);
   }
   FastLED.show();    
   delay(60);
@@ -39,11 +39,11 @@ void half(){
   int val = 0;
   for(int l=0;l<NUM_LEDS;l++){
     if(invert){
-      if(pixel[l].x<=0)      val = bright;
+      if(pixel[l].x<=0)      val = 255;
       else                  val = 0;
     }
     else{
-      if(pixel[l].x>=0)      val = bright;
+      if(pixel[l].x>=0)      val = 255;
       else                  val = 0;
     }
     leds[l].setHSV(hue,250, val);
@@ -68,10 +68,10 @@ void square(){
     
     if( p.x<R && p.x> -R )
       if(p.y<R && p.y> -R )
-        val = bright;
+        val = 255;
 
     if(invert){
-      if(val==0)  val = bright;
+      if(val==0)  val = 255;
       else        val = 0;
     }
 
@@ -90,7 +90,7 @@ void triangle(){
     R = pixel[l].y - 1.6 * pixel[l].x + 7 ;
     
     if( L>0 && R>0 && pixel[l].y < 4 )       
-      val = bright;
+      val = 255;
     else            val = 0;
     
     leds[l].setHSV( hue ,250,  val );
@@ -109,12 +109,12 @@ void cross(){
     p = pixel[l];
     val = 0;
     if(p.x< 2.1 && p.x> -2.1 )
-      val = bright;
+      val = 255;
     else if(p.y< 1.8 && p.y> -1.8)
-      val = bright;
+      val = 255;
     
     if(invert){
-      if(val==0)  val = bright;
+      if(val==0)  val = 255;
       else        val = 0;
     }
     leds[l].setHSV( hue ,250,  val );
@@ -134,21 +134,21 @@ void hatch(){
     
     int val = 0;
     if(y%6==0){
-      if(x%3==0)    val = bright;
+      if(x%3==0)    val = 255;
     }
     if(y%6==1 || y%6==5){
-      if(h%3==0)    val = bright;
-      if(h%3==1)    val = bright;
+      if(h%3==0)    val = 255;
+      if(h%3==1)    val = 255;
     }
     else if(y%6==2 || y%6==4){
-      if(x%3!=0)  val = bright;
+      if(x%3!=0)  val = 255;
     }
     else if(y%6==3){
-      if(h%3==2)  val = bright;
+      if(h%3==2)  val = 255;
     }
     
     if(invert){
-      if(val==0) val = bright;
+      if(val==0) val = 255;
       else       val = 0;
     }
     
@@ -170,23 +170,23 @@ void hatch2(){
     
     int val = 0;
     if(y%8==0){
-      if(x%4==0)                val = bright;
+      if(x%4==0)                val = 255;
     }
     else if(y%8==1 || y%8==7){
-      if(h%4==0 || h%4==1)      val = bright;
+      if(h%4==0 || h%4==1)      val = 255;
     }
     else if(y%8==2|| y%8==6){
-      if(x%4==1 || x%4==3)      val = bright;
+      if(x%4==1 || x%4==3)      val = 255;
     }
     else if(y%8==3|| y%8==5){
-      if(h%4==2 || h%4==3)      val = bright;
+      if(h%4==2 || h%4==3)      val = 255;
     }
     else if(y%8==4){
-      if(x%4==2)                val = bright;
+      if(x%4==2)                val = 255;
     }
 
     if(invert){
-      if(val==0) val = bright;
+      if(val==0) val = 255;
       else       val = 0;
     }
     leds[l].setHSV( hue ,250, val );  
@@ -207,15 +207,15 @@ void arrow(){
 
     if(row%2==0){
       x = abs( int(pixel[l].x) );
-      if((x-row/2+10*Q)%Q==0)    val = bright;
+      if((x-row/2+10*Q)%Q==0)    val = 255;
     }
     else{
       x = abs(int(pixel[l].x));
-      if((x-row/2+10*Q)%Q==0)    val = bright;
+      if((x-row/2+10*Q)%Q==0)    val = 255;
     }
 
     if(invert){
-      if(val==0) val = bright;  else  val = 0;
+      if(val==0) val = 255;  else  val = 0;
     }
     leds[l].setHSV( hue ,255,  val );
   }
@@ -245,16 +245,16 @@ void waves(){
     if(!invert){
       val = 0;
       if(p>1-r)
-        val = int( linear(p, 1-r,1, 0,bright)  );
+        val = int( linear(p, 1-r,1, 0,255)  );
       else if(p<r)
-        val = int( linear(p, 0,r, bright,0)  );
+        val = int( linear(p, 0,r, 255,0)  );
     }
     else {
-      val = bright;
+      val = 255;
       if(p>1-r)
-        val = int( linear(p, 1-r,1, bright,0)  );
+        val = int( linear(p, 1-r,1, 255,0)  );
       else if(p<r)
-        val = int( linear(p, 0,r, 0,bright)  );
+        val = int( linear(p, 0,r, 0,255)  );
     }
     
     leds[l].setHSV( hue ,250,  val );
@@ -282,9 +282,9 @@ void line(){
 
     if(!invert){
       if(d<w)
-        val = bright;
+        val = 255;
       else if(d<w+r)
-        val = int( linear(d, w,w+r, bright,0) );
+        val = int( linear(d, w,w+r, 255,0) );
       else
         val = 0;
     }
@@ -292,9 +292,9 @@ void line(){
       if(d<w)
         val = 0;
       else if(d<w+r)
-        val = int( linear(d, w,w+r, 0,bright) );
+        val = int( linear(d, w,w+r, 0,255) );
       else
-        val = bright;
+        val = 255;
     }      
     leds[l].setHSV( hue,250, val );  
   }
@@ -314,10 +314,10 @@ void lines(){
 
     if(!invert){
       val = 0;
-      if(x%D==0)      val = bright;
+      if(x%D==0)      val = 255;
     }
     else {
-      val = bright;
+      val = 255;
       if(x%D==0)      val = 0;
     }
     
@@ -336,7 +336,7 @@ void stripes(){
 
   for(int l=0;l<NUM_LEDS;l++){
     tmp = sin( (pixel[l].x + pixel[l].y) /1 );
-    val = int((tmp + 1) * bright);
+    val = int((tmp + 1) * 255);
 
     leds[l].setHSV( hue ,250,  val );
   }
@@ -359,16 +359,16 @@ void scroll_lines(){
     if(!invert){
       val = 0;
       if(p>1-r)
-        val = int( linear(p, 1-r,1, 0,bright )  );
+        val = int( linear(p, 1-r,1, 0,255 )  );
       else if(p<r)
-        val = int( linear(p, 0,r, bright,0)  );
+        val = int( linear(p, 0,r, 255,0)  );
     }
     else{
-      val = bright;
+      val = 255;
       if(p>1-r)
-        val = int( linear(p, 1-r,1, bright,0 )  );
+        val = int( linear(p, 1-r,1, 255,0 )  );
       else if(p<r)
-        val = int( linear(p, 0,r, 0,bright)  );
+        val = int( linear(p, 0,r, 0,255)  );
     }
     
     leds[l].setHSV( hue ,250,  val );
@@ -384,18 +384,6 @@ void scroll_lines(){
 } 
 
 
-
-
-
-// void empty(){
-//   int val;
-//   for(int l=0;l<NUM_LEDS;l++){
-//     val = l;
-//     leds[l].setHSV( hue ,250,  val );
-//   }
-//   FastLED.show();  
-//   delay(100);
-// }
 
 
 

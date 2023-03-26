@@ -28,7 +28,8 @@ const float DY = 0.866;
 void init_pixel(){
     
   FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS);
-    
+  FastLED.setBrightness(100);
+  
   int led_index = 0;
   
   for(uint8_t row=0; row<N_ROWS; row++)

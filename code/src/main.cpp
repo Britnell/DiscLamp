@@ -5,6 +5,7 @@
 #include "automaton.h"
 #include "rain.h"
 #include "zig.h"
+#include "fast.h"
 
 void setup() {
 
@@ -39,6 +40,8 @@ void loop() {
   else if(mode.equals("rain"))    rain();
   else if(mode.equals("autom"))   automaton();
   else if(mode.equals("zig"))   zig();
+  
+  else if(mode.equals("fast"))   fast();
   
   else square();
 

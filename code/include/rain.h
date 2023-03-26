@@ -47,7 +47,7 @@ void rain(){
 
     val = 0;
     if(dist<rain_rad)
-      val = int(expon( (rain_rad-dist), 0,rain_rad, 0,bright) );
+      val = int(expon( (rain_rad-dist), 0,rain_rad, 0,255) );
 
     leds[l].setHSV( hue ,250,  val );
   }

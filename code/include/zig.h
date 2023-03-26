@@ -23,9 +23,9 @@ void zig(){
 
     val = 0;
     if(p>1-r)
-        val = int( linear(p, 1-r,1, 0,bright )  );
+        val = int( linear(p, 1-r,1, 0,255 )  );
     else if(p<r)
-        val = int( linear(p, 0,r, bright,0)  );
+        val = int( linear(p, 0,r, 255,0)  );
 
     leds[l].setHSV( hue ,255,  val );
   }

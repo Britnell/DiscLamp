@@ -85,9 +85,6 @@ void update_autom(){
   uint8_t next [NUM_LEDS];
 
   for(int l=0;l<NUM_LEDS;l++){
-    // Paint
-    if(aut_state[l])    leds[l].setHSV( hue,250, bright);
-    else    leds[l].setHSV( hue,250, 0);
 
 
     // find neighbors + count score
@@ -105,7 +102,6 @@ void update_autom(){
         next[l] = 1;
     }
   }
-  FastLED.show();  
 
   // Transfer state
   int total = 0;
@@ -124,6 +120,18 @@ void automaton(){
     init_autom();
     aut_initialised = 1;
   }
+
+
+  // Paint
+  for(int l=0;l<NUM_LEDS;l++){
+    if(aut_state[l])    
+    leds[l] += CRGB(0,0,0).setHSV(hue,250, 255).scale8(10);
+    else    leds[l].nscale8(240);
+  }
+  FastLED.show();  
+  delay(20);
+
+  // automaton state
   if(millis()-timer > 1600){
     timer = millis();
     update_autom();
@@ -133,5 +141,4 @@ void automaton(){
       autom_eras=0;
     }
   }
-  delay(20);
 }
