@@ -80,15 +80,15 @@ void init_pixel(){
 void demo(){
 
   for(int x=0; x<NUM_LEDS;x++){
-    for(int i=0; i<NUM_LEDS;i++){
-      if(x==i)
-        leds[i] = CRGB::Red;
+    for(int l=0; l<NUM_LEDS;l++){
+      if(l>=x && l<x+8)
+        leds[l] = CRGB::Red;
       else 
-        leds[i] = CRGB::Black;
+        leds[l] = CRGB::Black;
 
     }
     FastLED.show();
-    delay(1);
+    delay(2);
   }
 }
 

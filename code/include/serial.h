@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include "pattern.h"
 #include "lib.h"
+#include "pixel.h"
 
 String ser_buf = "";
 
@@ -12,10 +13,23 @@ void cmd_line(String str){
     str.remove(0,1);
     if(cmd=='m'){
         mode = str;
-        p(" m= ");
+        p(" mode = ");
         pl(str);
+        return;
     }
-    else 
+    if(cmd=='b'){
+        bright = str.toInt();
+        FastLED.setBrightness(bright);
+        p(" bright = ");
+        pl(bright);
+        return;
+    }    
+    if(cmd=='h'){
+        hue = str.toInt();
+        p(" hue = ");
+        pl(hue);
+        return;
+    }
     pl(str);
 }
 
