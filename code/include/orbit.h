@@ -1,6 +1,7 @@
 #ifndef ORBIT_H
 #define ORBIT_H
 
+#include "connect.h"
 
 typedef struct {
   float x;
@@ -12,7 +13,82 @@ typedef struct {
   float rad;
 } Orbit;
 
+void print_orbit(Orbit* orb){
+    p(" O  ,  p: "); 
+    p(orb->x); p(" , "); p(orb->y); p(" \t v: ");
+    p(orb->vx); p(" , "); p(orb->vy); p(" \t a: ");
+    p(orb->ax); p(" , "); p(orb->ay); p(" , ");
+    pl();
+}
 
+float random_angle(){
+    return linear( random(0,100), 0,100, 0, 2*PI );
+}
+
+
+int orbit_f = 0;
+void orbit_impulse(Orbit *orb){
+    int every_s = 8 * 50;
+    if( orbit_f++ % every_s == 0){
+        if(random(4)==0){
+            float ang = random_angle();
+            orb->ax = cos(ang);
+            orb->ay = sin(ang);
+        }
+        
+    }
+}
+
+void step_orbit(Orbit *orb){
+    float max_sp = 2;
+    
+    // apply
+    int speed = 80;
+    orb->vx += orb->ax / speed;
+    orb->vy += orb->ay / speed;
+    orb->x += orb->vx / speed;
+    orb->y += orb->vy / speed;
+
+    // stop when reach velocity of 1 in any dir
+    if(orb->vx>max_sp){
+        orb->vx = max_sp;
+        orb->ax = 0;    orb->ay = 0;
+    }
+    if(orb->vx<-max_sp){
+        orb->vx = -max_sp;
+        orb->ax = 0;    orb->ay = 0;
+    }
+    if(orb->vy>max_sp){
+        orb->vy = max_sp;
+        orb->ax = 0;    orb->ay = 0;
+    }
+    if(orb->vy<-max_sp){
+        orb->vy = -max_sp;
+        orb->ax = 0;    orb->ay = 0;
+    }
+
+    // bounce off edges
+    float dist = sqrt(orb->x * orb->x + orb->y * orb->y);
+    if(dist> 5){
+        float mag = sqrt(orb->vx * orb->vx + orb->vy * orb->vy);
+        orb->ax = 0;
+        orb->ay = 0;
+
+        // turn around 180
+        float ang = atan2(orb->y,orb->x);
+        ang += PI + linear(random(0,100), 0,100, -0.8, 0.8 );
+        orb->vx = mag * cos(ang);
+        orb->vy = mag * sin(ang);
+        step_orbit(orb);
+
+        // float ang
+    }
+
+    // random impulses
+    orbit_impulse(orb);
+
+//
+}
 
 
 

@@ -10,17 +10,29 @@ Orbit red;
 uint8_t hues_initialised = 0;
 
 void init_hues(){
-    blue.x = 0;
-    blue.y = 3;
-    blue.rad = 2.8;
+    if(hues_initialised) return;
+    hues_initialised = 1;
+    
+    blue.x = 2;
+    blue.y = 2;
+    red.x = -2;
+    red.y = -2;
+    
+    blue.rad = 7;
+    red.rad = 3.9;
+
+    
     blue.vx = 0;
     blue.vy = 0;
-    
-    red.x = 0;
-    red.y = -3;
-    red.rad = 2.8;
     red.vx = 0;
     red.vy = 0;
+    
+    float ang = random_angle();
+    blue.ax = cos(ang);
+    blue.ay = sin(ang);
+    ang = random_angle();
+    red.ax = cos(ang);
+    red.ay = sin(ang);
     
 }
 
@@ -28,16 +40,14 @@ float get_dist(float xa, float ya, float xb, float yb){
     return abs( (xa-xb)*(xa-xb) + (ya-yb)*(ya-yb) );
 }
 
-void hues(){
+void step_hues(){
+    step_orbit(&blue);
+    step_orbit(&red);
+}
 
-    if(!hues_initialised){
-        init_hues();
-        hues_initialised = 1;
-    }
-
-    float glow = 0.9;
+void draw_hues(){
+    float glow = 2.2;
     float dist;
-
     for(int l=0;l<NUM_LEDS;l++){
         int c_b = 0;
         int c_r = 0;
@@ -51,12 +61,20 @@ void hues(){
         dist = get_dist( pixel[l].x, pixel[l].y, red.x,red.y );
         if(dist<red.rad)
             c_r = 255;
-        else if(dist < blue.rad + glow)
-            c_r = linear( dist, blue.rad,blue.rad+glow, 255,0 );
+        else if(dist < red.rad + glow)
+            c_r = linear( dist, red.rad,red.rad+glow, 255,0 );
         
         leds[l] = CRGB(c_r,0,c_b);
     }
     FastLED.show();
+}
 
-    delay(100);
+void hues(){
+
+    init_hues();
+    
+    step_hues();
+    draw_hues();
+
+    delay(20);
 }
