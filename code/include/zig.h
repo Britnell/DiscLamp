@@ -31,7 +31,7 @@ void zig(){
   }
   FastLED.show();  
 
-  f -= 0.01;
+  f -= 0.02;
   delay(10);
 
 }

@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include <FastLED.h>
+#include "lib.h"
 
 #define NUM_LEDS  151
 #define DATA_PIN   D4
@@ -61,7 +62,7 @@ void init_pixel(){
         led.x = -(x_offset + (rowleds-1) - r );
 
       led.y = - ( N_ROWS - 8 - row ) * DY;
-      
+
       // insert
       pixel[led_index] = led;
       led_index++;
