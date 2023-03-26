@@ -32,7 +32,7 @@ void loop() {
   else if(mode.equals("stripes"))   stripes();
 
   else if(mode.equals("scroll"))    scroll_lines();
-  else if(mode.equals("waves"))   perc_a();
+  else if(mode.equals("waves"))   waves();
   // else if(mode.equals("cross"))   cross();
   // else if(mode.equals("count"))    //   count();
   else if(mode.equals("rain"))    rain();
