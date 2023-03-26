@@ -4,7 +4,7 @@
 #include "pixel.h"
 #include "lib.h"
 
-String mode = "autom";
+String mode = "zig";
 unsigned short bright = 100;
 unsigned short hue = 0;
 short invert = 0;
@@ -227,7 +227,13 @@ void arrow(){
 
 // * * * * * * * * * * * *  * * * * * * * * *  ** * * * * * * * * * * * 
 
-void perc_a(){
+float f_cap(float p){
+  if(p<0) p = -p;
+  while(p>1.0){   p -= 1.0;   }
+  return p;
+}
+
+void waves(){
   float q = 6.0;    // every Q repeat
   float r = 0.3;    // 0.3*6 = true rad
   
@@ -323,6 +329,23 @@ void lines(){
 } 
 
 
+
+void stripes(){
+  int val;
+  float tmp;
+
+  for(int l=0;l<NUM_LEDS;l++){
+    tmp = sin( (pixel[l].x + pixel[l].y) /1 );
+    val = int((tmp + 1) * bright);
+
+    leds[l].setHSV( hue ,250,  val );
+  }
+  FastLED.show();  
+
+  delay(100);
+}
+
+
 void scroll_lines(){
   float q = 6.0;    // every Q repeat
   float r = 0.3;    // 0.3*6 = true rad
@@ -353,29 +376,14 @@ void scroll_lines(){
   FastLED.show();  
 
   f += 0.01;
-  if(every(5)){
-    // if(++d>=255)  d=0;
-  }
+  // if(every(5)){
+  //   if(++d>=255)  d=0;
+  // }
 
   delay(20);
 } 
 
 
-
-void stripes(){
-  int val;
-  float tmp;
-
-  for(int l=0;l<NUM_LEDS;l++){
-    tmp = sin( (pixel[l].x + pixel[l].y) /1 );
-    val = int((tmp + 1) * 127);
-
-    leds[l].setHSV( hue ,250,  val );
-  }
-  FastLED.show();  
-
-  delay(100);
-}
 
 
 

@@ -4,6 +4,7 @@
 #include "pattern.h"
 #include "automaton.h"
 #include "rain.h"
+#include "zig.h"
 
 void setup() {
 
@@ -30,13 +31,14 @@ void loop() {
   
   else if(mode.equals("bar"))    line();
   else if(mode.equals("stripes"))   stripes();
-
   else if(mode.equals("scroll"))    scroll_lines();
   else if(mode.equals("waves"))   waves();
+  
   // else if(mode.equals("cross"))   cross();
   // else if(mode.equals("count"))    //   count();
   else if(mode.equals("rain"))    rain();
   else if(mode.equals("autom"))   automaton();
+  else if(mode.equals("zig"))   zig();
   
   else square();
 

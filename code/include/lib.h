@@ -28,10 +28,5 @@ int every(int num){
 }
 
 
-float f_cap(float p){
-  if(p<0) p = -p;
-  while(p>1.0){   p -= 1.0;   }
-  return p;
-}
 
 #endif
