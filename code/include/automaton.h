@@ -7,7 +7,7 @@ uint8_t aut_state[NUM_LEDS];
 uint8_t rule[3];
 
 int autom_eras;
-
+int autom_hist[5] = {1,2,3,4,5};
 
 // 234 & 245 can get kinda stuck
 
@@ -85,8 +85,6 @@ void update_autom(){
   uint8_t next [NUM_LEDS];
 
   for(int l=0;l<NUM_LEDS;l++){
-
-
     // find neighbors + count score
     int nbrs[6] = {-1,-1,-1,-1,-1,-1};
     int score = 0;
@@ -109,10 +107,25 @@ void update_autom(){
     aut_state[l] = next[l];
     total += next[l];
   }
+  // track history
+  for(int h=4;h>0;h--){
+    autom_hist[h] = autom_hist[h-1];
+  }
+  autom_hist[0] = total;
 
+  pl(total);
   // check it snot dying out
   if(total==0) autom_start();
   else if(total<=12)   safe_rules();
+  // catch stuck / alternating patterns
+  else if(autom_hist[0]==autom_hist[1] && autom_hist[1]==autom_hist[2] && autom_hist[2]==autom_hist[3]){
+      random_rules();
+      pl(" ====== ");
+    }
+  else if(autom_hist[0]==autom_hist[2] && autom_hist[2]==autom_hist[3]){
+    random_rules();
+    pl(" / / / / ");
+  }
 }
 
 void automaton(){
@@ -120,7 +133,6 @@ void automaton(){
     init_autom();
     aut_initialised = 1;
   }
-
 
   // Paint
   for(int l=0;l<NUM_LEDS;l++){
