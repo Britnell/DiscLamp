@@ -124,15 +124,16 @@ void automaton(){
 
   // Paint
   for(int l=0;l<NUM_LEDS;l++){
-    if(aut_state[l])    
-    leds[l] += CRGB(0,0,0).setHSV(hue,250, 255).scale8(10);
-    else    leds[l].nscale8(240);
+    if(aut_state[l])    {
+      leds[l] += CRGB(0,0,0).setHSV(hue,250, 1);
+    }
+    else    leds[l].nscale8(230);
   }
   FastLED.show();  
-  delay(20);
+  delay(10);
 
   // automaton state
-  if(millis()-timer > 1600){
+  if(millis()-timer > 2000){
     timer = millis();
     update_autom();
 
