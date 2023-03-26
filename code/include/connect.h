@@ -1,5 +1,5 @@
-#ifndef PIXEL_WIFI_CONNECT
-#define PIXEL_WIFI_CONNECT
+#ifndef CONNECT_H
+#define CONNECT_H
 
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>

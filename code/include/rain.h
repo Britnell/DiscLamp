@@ -14,13 +14,13 @@ float rain_speed = 0.04;
 typedef struct {
   float x;
   float y;
-} PARTICLE;
+} RAIN_PARTICLE;
 
 
-PARTICLE particles[NUM_RAIN];
+RAIN_PARTICLE particles[NUM_RAIN];
 
 void rain(){
-  PARTICLE p;
+  RAIN_PARTICLE p;
 
   if(!rain_initialised){
     for(int r=0;r<NUM_RAIN;r++){

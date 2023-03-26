@@ -4,8 +4,9 @@
 #include "pattern.h"
 #include "automaton.h"
 #include "rain.h"
+#include "hues.h"
 #include "zig.h"
-#include "fast.h"
+// #include "fast.h"
 
 void setup() {
 
@@ -36,14 +37,15 @@ void loop() {
   else if(mode.equals("stripes"))   stripes();
   else if(mode.equals("scroll"))    scroll_lines();
   else if(mode.equals("waves"))   waves();
+  else if(mode.equals("zig"))   zig();
+  
+  else if(mode.equals("rain"))    rain();
+  else if(mode.equals("hues"))    hues();
+  else if(mode.equals("autom"))   automaton();
   
   // else if(mode.equals("cross"))   cross();
   // else if(mode.equals("count"))    //   count();
-  else if(mode.equals("rain"))    rain();
-  else if(mode.equals("autom"))   automaton();
-  else if(mode.equals("zig"))   zig();
-  
-  else if(mode.equals("fast"))   fast();
+  // else if(mode.equals("fast"))   fast();
   
   else square();
 

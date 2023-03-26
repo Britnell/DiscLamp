@@ -1,5 +1,5 @@
-#ifndef PIXEL_CLASS
-#define PIXEL_CLASS
+#ifndef PIXEL_H
+#define PIXEL_H
 
 #include <Arduino.h>
 #include <FastLED.h>

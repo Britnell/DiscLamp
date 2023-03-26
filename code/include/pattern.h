@@ -1,10 +1,10 @@
-#ifndef PATTERN
-#define PATTERN
+#ifndef PATTERN_H
+#define PATTERN_H
 
 #include "pixel.h"
 #include "lib.h"
 
-String mode = "trif";
+String mode = "hues";
 unsigned short bright = 100;
 unsigned short hue = 0;
 short invert = 0;
