@@ -81,6 +81,24 @@ void find_neighbours(LED_STRUCT pix, int nbrs[6] ){
   nbrs[5] = find_pixel(pix.x-0.5,pix.y-DY);
 }
 
+
+void autom_check(int total){
+  // track history
+  for(int h=4;h>0;h--){
+    autom_hist[h] = autom_hist[h-1];
+  }
+  autom_hist[0] = total;
+
+  // check if dying out
+  if(total<6) autom_start();
+  else if(total<=12)   safe_rules();
+  // catch stuck / alternating patterns
+  else if(autom_hist[0]==autom_hist[1] && autom_hist[1]==autom_hist[2] && autom_hist[2]==autom_hist[3])
+    random_rules();
+  else if(autom_hist[0]==autom_hist[2] && autom_hist[1]==autom_hist[3])
+    random_rules();
+}
+
 void update_autom(){
   uint8_t next [NUM_LEDS];
 
@@ -107,21 +125,8 @@ void update_autom(){
     aut_state[l] = next[l];
     total += next[l];
   }
-  // track history
-  for(int h=4;h>0;h--){
-    autom_hist[h] = autom_hist[h-1];
-  }
-  autom_hist[0] = total;
-
-  pl(total);
-  // check it snot dying out
-  if(total<6) autom_start();
-  else if(total<=12)   safe_rules();
-  // catch stuck / alternating patterns
-  else if(autom_hist[0]==autom_hist[1] && autom_hist[1]==autom_hist[2] && autom_hist[2]==autom_hist[3])
-    random_rules();
-  else if(autom_hist[0]==autom_hist[2] && autom_hist[1]==autom_hist[3])
-    random_rules();
+  
+  autom_check(total);
 }
 
 void automaton(){
