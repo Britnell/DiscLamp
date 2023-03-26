@@ -115,17 +115,13 @@ void update_autom(){
 
   pl(total);
   // check it snot dying out
-  if(total==0) autom_start();
+  if(total<6) autom_start();
   else if(total<=12)   safe_rules();
   // catch stuck / alternating patterns
-  else if(autom_hist[0]==autom_hist[1] && autom_hist[1]==autom_hist[2] && autom_hist[2]==autom_hist[3]){
-      random_rules();
-      pl(" ====== ");
-    }
-  else if(autom_hist[0]==autom_hist[2] && autom_hist[2]==autom_hist[3]){
+  else if(autom_hist[0]==autom_hist[1] && autom_hist[1]==autom_hist[2] && autom_hist[2]==autom_hist[3])
     random_rules();
-    pl(" / / / / ");
-  }
+  else if(autom_hist[0]==autom_hist[2] && autom_hist[1]==autom_hist[3])
+    random_rules();
 }
 
 void automaton(){
