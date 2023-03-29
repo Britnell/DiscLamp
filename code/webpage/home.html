@@ -46,8 +46,17 @@
         <input id="hue" type="range" min="0" max="255" value="0" step="5" />
       </div>
       <div>
-        <label>Invert </label>
-        <input id="invert" type="checkbox" />
+        <label>
+          <input id="invert" type="checkbox" />
+          Invert
+        </label>
+      </div>
+      <div>
+        <form id="cmd">
+          <label>CMD</label>
+          <input name="cip" type="text" />
+          <button>>></button>
+        </form>
       </div>
     </container>
     <script>
@@ -75,6 +84,7 @@
       const dimmer = document.getElementById("dimmer");
       const hue = document.getElementById("hue");
       const invert = document.getElementById("invert");
+      const cmd = document.getElementById("cmd");
 
       mode.onchange = (ev) => set("m", ev.target.value);
       dimmer.oninput = (ev) => set("b", ev.target.value);
@@ -94,6 +104,12 @@
         el.textContent = m;
         mode.appendChild(el);
       });
+
+      cmd.onsubmit = (ev) => {
+        ev.preventDefault();
+        const v = ev.target.elements.cip.value;
+        set(v[0], v.slice(1));
+      };
     </script>
   </body>
 </html>
