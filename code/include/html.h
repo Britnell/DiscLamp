@@ -1,5 +1,6 @@
 
 const char * html = R"rawliteral(
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -72,30 +73,32 @@ const modes = [
 "waves",
 "stripes",
 "rain",
-"autom",
-"count",
 ];
 const mode = document.getElementById("mode");
 const dimmer = document.getElementById("dimmer");
 const hue = document.getElementById("hue");
 const invert = document.getElementById("invert");
-mode.onchange = (ev) => set("mode", ev.target.value);
-dimmer.oninput = (ev) => set("bright", ev.target.value);
-hue.oninput = (ev) => set("hue", ev.target.value);
-invert.onchange = (ev) => set("invert", ev.target.checked ? 1 : 0);
+
+mode.onchange = (ev) => set("m", ev.target.value);
+dimmer.oninput = (ev) => set("b", ev.target.value);
+hue.oninput = (ev) => set("h", ev.target.value);
+invert.onchange = (ev) => set("i", ev.target.checked ? 1 : 0);
+
+function nextmode() {
+let s = mode.selectedIndex + 1;
+if (s >= mode.options.length) s = 0;
+mode.selectedIndex = s;
+set("m", mode.value);
+}
+
 modes.forEach((m) => {
 const el = document.createElement("option");
 el.value = m;
 el.textContent = m;
 mode.appendChild(el);
 });
-function nextmode() {
-let s = mode.selectedIndex + 1;
-if (s >= mode.options.length) s = 0;
-mode.selectedIndex = s;
-set("mode", mode.value);
-}
 </script>
 </body>
 </html>
+
 )rawliteral";

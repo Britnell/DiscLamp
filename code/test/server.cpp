@@ -3,7 +3,6 @@
 
 
 void setup() {
-
   wifi_setup();
   // print_ip();
 }

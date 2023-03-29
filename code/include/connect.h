@@ -7,8 +7,10 @@
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
 #include "html.h"
-#include "pattern.h"
+// #include "pattern.h"
 #include "secrets.h"
+
+char serbuf[100];
 
 // - WIfi
 ESP8266WebServer server(80);
@@ -43,24 +45,21 @@ void handleSet(){
     String message = "";
     for(uint8_t i=0; i<server.args(); i++)
     {
-        // message += server.argName(i) + "=" + server.arg(i)+";";
-        if(server.argName(i).equals("bright")){
-            bright = server.arg(i).toInt(); 
-        }
-        else if(server.argName(i).equals("mode")){
-            mode = server.arg(i); 
-        }
-        else if(server.argName(i).equals("hue")){
-            hue = server.arg(i).toInt(); 
-        }
-        else if(server.argName(i).equals("hue")){
-            invert = server.arg(i).toInt(); 
-        }   
+        message = server.argName(i)  + server.arg(i) + "\n";
+        Serial1.print(message);
     }
-    server.send(200, "text/plain", message);
+    server.send(200, "text/plain", "OK");
 }
 
-void connect_wifi(){
+
+void print_ip(){
+  Serial.print(" wifi connected : ");
+  Serial.println(WiFi.localIP());
+}
+
+void wifi_setup(){
+  Serial1.begin(115200);
+  Serial1.println(" ready ");
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
@@ -70,8 +69,8 @@ void connect_wifi(){
     ESP.restart();
   }
   
-  //   Serial.begin(115200);
-  // Serial.println(WiFi.localIP());
+  //   Serial1.begin(115200);
+  // Serial1.println(WiFi.localIP());
   //   ArduinoOTA.setHostname("LAMP-ESP");
   //   ArduinoOTA.setPassword("admin");
   //   ArduinoOTA.begin();
@@ -85,7 +84,7 @@ void connect_wifi(){
 }
 
 
-void check_server(){
+void wifi_loop(){
     server.handleClient();
 }
 
