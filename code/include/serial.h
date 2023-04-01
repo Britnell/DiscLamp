@@ -6,7 +6,8 @@
 #include "lib.h"
 #include "pixel.h"
 
-String ser_buf = "";
+char pbuffer[100];
+String serial_in = "";
 
 void cmd_line(String str){
     char cmd = str.charAt(0);
@@ -37,10 +38,10 @@ void read_serial(){
     while(Serial.available()>0){
         char c = Serial.read();
         if(c=='\n'){
-            cmd_line(ser_buf);
-            ser_buf = "";
+            cmd_line(serial_in);
+            serial_in = "";
         }
-        else ser_buf += c;
+        else serial_in += c;
     }
 }
 

@@ -1,7 +1,9 @@
 #include <Arduino.h>
-#include "pixel.h"
+
 #include "serial.h"
+#include "pixel.h"
 #include "pattern.h"
+
 #include "automaton.h"
 #include "rain.h"
 #include "hues.h"

@@ -10,7 +10,6 @@
 // #include "pattern.h"
 #include "secrets.h"
 
-char serbuf[100];
 
 // - WIfi
 ESP8266WebServer server(80);
@@ -58,8 +57,8 @@ void print_ip(){
 }
 
 void wifi_setup(){
+  Serial.begin(115200);
   Serial1.begin(115200);
-  Serial1.println(" ready ");
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
@@ -69,8 +68,8 @@ void wifi_setup(){
     ESP.restart();
   }
   
-  //   Serial1.begin(115200);
-  // Serial1.println(WiFi.localIP());
+  print_ip();
+
   //   ArduinoOTA.setHostname("LAMP-ESP");
   //   ArduinoOTA.setPassword("admin");
   //   ArduinoOTA.begin();

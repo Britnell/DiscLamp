@@ -4,7 +4,7 @@
 #include "pixel.h"
 #include "lib.h"
 
-String mode = "hues";
+String mode = "clock";
 unsigned short bright = 100;
 unsigned short hue = 0;
 short invert = 0;

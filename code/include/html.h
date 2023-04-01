@@ -1,6 +1,5 @@
 
 const char * html = R"rawliteral(
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -49,8 +48,17 @@ max-width: 400px;
 <input id="hue" type="range" min="0" max="255" value="0" step="5" />
 </div>
 <div>
-<label>Invert </label>
+<label>
 <input id="invert" type="checkbox" />
+Invert
+</label>
+</div>
+<div>
+<form id="cmd">
+<label>CMD</label>
+<input name="cip" type="text" />
+<button>>></button>
+</form>
 </div>
 </container>
 <script>
@@ -73,11 +81,15 @@ const modes = [
 "waves",
 "stripes",
 "rain",
+"hues",
+"trif",
+"autom",
 ];
 const mode = document.getElementById("mode");
 const dimmer = document.getElementById("dimmer");
 const hue = document.getElementById("hue");
 const invert = document.getElementById("invert");
+const cmd = document.getElementById("cmd");
 
 mode.onchange = (ev) => set("m", ev.target.value);
 dimmer.oninput = (ev) => set("b", ev.target.value);
@@ -97,6 +109,11 @@ el.value = m;
 el.textContent = m;
 mode.appendChild(el);
 });
+cmd.onsubmit = (ev) => {
+ev.preventDefault();
+const v = ev.target.elements.cip.value;
+set(v[0], v.slice(1));
+};
 </script>
 </body>
 </html>
