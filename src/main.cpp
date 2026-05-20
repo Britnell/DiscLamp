@@ -23,6 +23,7 @@ void setup() {
 
 void loop() {
   read_serial();
+  grad_tick();
   
   if(mode.equals("full"))   full();
   else if(mode.equals("half"))    half();

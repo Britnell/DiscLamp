@@ -4,16 +4,18 @@
 #include "pixel.h"
 #include "lib.h"
 
-String mode = "autom";
-#define HUE_DIFF 50
+String mode = "square";
+#define HUE_DIFF 20
 
-unsigned short bright = 100;
-unsigned short hue = 10;
+unsigned short bright = 50;
+unsigned short hue = 1;
 unsigned short hue_a = hue + HUE_DIFF;
 unsigned short hue_b = (hue + 256 - HUE_DIFF) % 256;
 short invert = 0;
 float f = 0;
 long timer = 0;
+
+#include "gradient.h"
 
 
 
@@ -32,7 +34,7 @@ int find_pixel(float x, float y){
 
 void full(){
   for(int l=0;l<NUM_LEDS;l++){
-      leds[l].setHSV(hue,250, 255);
+      leds[l].setHSV(grad_hue(pixel[l].x, pixel[l].y),250, 255);
   }
   FastLED.show();    
   delay(60);
@@ -50,7 +52,7 @@ void half(){
       if(pixel[l].x>=0)      val = 255;
       else                  val = 0;
     }
-    leds[l].setHSV(hue,250, val);
+    leds[l].setHSV(grad_hue(pixel[l].x, pixel[l].y),250, val);
   }
   FastLED.show();  
   delay(100);
@@ -79,7 +81,7 @@ void square(){
       else        val = 0;
     }
 
-    leds[l].setHSV( hue ,250,  val );
+    leds[l].setHSV( grad_hue(pixel[l].x, pixel[l].y) ,250,  val );
   }
   FastLED.show();  
 
@@ -97,7 +99,7 @@ void triangle(){
       val = 255;
     else            val = 0;
     
-    leds[l].setHSV( hue ,250,  val );
+    leds[l].setHSV( grad_hue(pixel[l].x, pixel[l].y) ,250,  val );
   }
   FastLED.show();  
 
@@ -121,7 +123,7 @@ void cross(){
       if(val==0)  val = 255;
       else        val = 0;
     }
-    leds[l].setHSV( hue ,250,  val );
+    leds[l].setHSV( grad_hue(pixel[l].x, pixel[l].y) ,250,  val );
   }
   FastLED.show();  
 
@@ -183,7 +185,7 @@ void hatch(){
       else       val = 0;
     }
     
-    leds[l].setHSV( hue ,250, val );  
+    leds[l].setHSV( grad_hue(pixel[l].x, pixel[l].y) ,250, val );  
   }
   FastLED.show();  
   
@@ -220,7 +222,7 @@ void hatch2(){
       if(val==0) val = 255;
       else       val = 0;
     }
-    leds[l].setHSV( hue ,250, val );  
+    leds[l].setHSV( grad_hue(pixel[l].x, pixel[l].y) ,250, val );  
   }
   FastLED.show();  
   
@@ -248,7 +250,7 @@ void arrow(){
     if(invert){
       if(val==0) val = 255;  else  val = 0;
     }
-    leds[l].setHSV( hue ,255,  val );
+    leds[l].setHSV( grad_hue(pixel[l].x, pixel[l].y) ,255,  val );
   }
   FastLED.show();  
 
@@ -281,7 +283,7 @@ void trif(){
       if(triforce[t]>l)
         break;
     }
-    leds[l].setHSV( hue ,255,  val );
+    leds[l].setHSV( grad_hue(pixel[l].x, pixel[l].y) ,255,  val );
   }
   FastLED.show();
   delay(100);
@@ -320,7 +322,7 @@ void waves(){
         val = int( linear(p, 0,r, 0,255)  );
     }
     
-    leds[l].setHSV( hue ,250,  val );
+    leds[l].setHSV( grad_hue(pixel[l].x, pixel[l].y) ,250,  val );
 
   }
   FastLED.show();  
@@ -359,7 +361,7 @@ void line(){
       else
         val = 255;
     }      
-    leds[l].setHSV( hue,250, val );  
+    leds[l].setHSV( grad_hue(pixel[l].x, pixel[l].y),250, val );  
   }
   FastLED.show();  
   
@@ -384,7 +386,7 @@ void lines(){
       if(x%D==0)      val = 0;
     }
     
-    leds[l].setHSV( hue ,250, val );  
+    leds[l].setHSV( grad_hue(pixel[l].x, pixel[l].y) ,250, val );  
   }
   FastLED.show();  
   
@@ -401,7 +403,7 @@ void stripes(){
     tmp = sin( (pixel[l].x + pixel[l].y) /1 );
     val = int((tmp + 1) * 255);
 
-    leds[l].setHSV( hue ,250,  val );
+    leds[l].setHSV( grad_hue(pixel[l].x, pixel[l].y) ,250,  val );
   }
   FastLED.show();  
 
@@ -434,7 +436,7 @@ void scroll_lines(){
         val = int( linear(p, 0,r, 0,255)  );
     }
     
-    leds[l].setHSV( hue ,250,  val );
+    leds[l].setHSV( grad_hue(pixel[l].x, pixel[l].y) ,250,  val );
   }
   FastLED.show();  
 

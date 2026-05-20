@@ -33,6 +33,12 @@ void cmd_line(String str){
         pl(hue);
         return;
     }
+    if(cmd=='i'){
+        invert = str.toInt();
+        p(" invert = ");
+        pl(invert);
+        return;
+    }
     pl(str);
 }
 
