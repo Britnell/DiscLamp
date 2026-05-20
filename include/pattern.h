@@ -4,9 +4,13 @@
 #include "pixel.h"
 #include "lib.h"
 
-String mode = "clock";
+String mode = "autom";
+#define HUE_DIFF 50
+
 unsigned short bright = 100;
-unsigned short hue = 0;
+unsigned short hue = 10;
+unsigned short hue_a = hue + HUE_DIFF;
+unsigned short hue_b = (hue + 256 - HUE_DIFF) % 256;
 short invert = 0;
 float f = 0;
 long timer = 0;

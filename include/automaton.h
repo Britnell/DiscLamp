@@ -135,12 +135,15 @@ void automaton(){
     aut_initialised = 1;
   }
 
-  // Paint
+  // Paint — smooth A→B→A oscillation over ~2.5s
+  static uint8_t fade_t = 0;
+  fade_t++;
+  CRGB col_a; col_a.setHSV(hue,   250, 255);
+  CRGB col_b; col_b.setHSV(hue_a, 250, 255);
+  CRGB target = blend(col_a, col_b, triwave8(fade_t));
   for(int l=0;l<NUM_LEDS;l++){
-    if(aut_state[l])    {
-      leds[l] += CRGB(0,0,0).setHSV(hue,250, 1);
-    }
-    else    leds[l].nscale8(230);
+    if(aut_state[l])  nblend(leds[l], target, 10);
+    else              leds[l].nscale8(230);
   }
   FastLED.show();  
   delay(10);
