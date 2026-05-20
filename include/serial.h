@@ -27,7 +27,7 @@ void cmd_line(String str){
     }    
     if(cmd=='h'){
         hue = str.toInt();
-        hue_a = (hue + HUE_DIFF) % 256;
+        hue_a = hue + HUE_DIFF;
         hue_b = (hue + 256 - HUE_DIFF) % 256;
         p(" hue = ");
         pl(hue);
