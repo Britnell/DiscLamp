@@ -42,6 +42,10 @@ float get_dist(float xa, float ya, float xb, float yb){
 
 
 void draw_hues(){
+    uint8_t ha = hue;
+    uint8_t hb = hue + 85;   // +256/3
+    uint8_t hc = hue + 127;  // +256/3 + 256/6
+
     float dist;
     for(int l=0;l<NUM_LEDS;l++){
         CRGB col = CRGB(0,0,0);
@@ -53,7 +57,7 @@ void draw_hues(){
             val = 255;
         else if(dist < blue.rad + orbit_glow)
             val = linear( dist, blue.rad,blue.rad + orbit_glow, 255,0 );
-        col += CRGB(0,0,val);
+        col += CHSV(ha, 250, val);
 
         val = 0;
         dist = get_dist( pixel[l].x, pixel[l].y, red.x,red.y );
@@ -61,16 +65,16 @@ void draw_hues(){
             val = 255;
         else if(dist < red.rad + orbit_glow)
             val = linear( dist, red.rad,red.rad + orbit_glow, 255,0 );
-        col += CRGB(val,0,0);
-        
+        col += CHSV(hb, 250, val);
+
         val = 0;
         dist = get_dist( pixel[l].x, pixel[l].y, green.x,green.y );
         if(dist<green.rad)
             val = 80;
         else if(dist < green.rad + orbit_glow)
             val = linear( dist, green.rad,green.rad + orbit_glow, 120,0 );
-        col += CRGB(0,val*0.8,val);
-        
+        col += CHSV(hc, 250, val);
+
         leds[l] = col;
     }
     FastLED.show();
