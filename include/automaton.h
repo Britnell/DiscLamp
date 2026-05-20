@@ -4,6 +4,7 @@
 
 uint8_t aut_initialised = 0;
 uint8_t aut_state[NUM_LEDS];
+uint8_t aut_prev[NUM_LEDS];
 uint8_t rule[3];
 
 int autom_eras;
@@ -135,15 +136,18 @@ void automaton(){
     aut_initialised = 1;
   }
 
-  // Paint — smooth A→B→A oscillation over ~2.5s
-  static uint8_t fade_t = 0;
+  // Paint
+  static uint8_t fade_t = 0;   // free-running, drives color A→B
+  static uint8_t bright_t = 0; // resets each gen, drives fade-in brightness
   fade_t++;
+  if(bright_t < 255) bright_t++;
   CRGB col_a; col_a.setHSV(hue,   250, 255);
   CRGB col_b; col_b.setHSV(hue_a, 250, 255);
   CRGB target = blend(col_a, col_b, triwave8(fade_t));
   for(int l=0;l<NUM_LEDS;l++){
-    if(aut_state[l])  nblend(leds[l], target, 10);
-    else              leds[l].nscale8(230);
+    if(aut_state[l] && aut_prev[l])  { leds[l] = target; leds[l].nscale8(triwave8(fade_t)); }
+    else if(aut_state[l])            { leds[l] = target; leds[l].nscale8(bright_t); }
+    else                               leds[l].nscale8(230);
   }
   FastLED.show();  
   delay(10);
@@ -151,6 +155,8 @@ void automaton(){
   // automaton state
   if(millis()-timer > 2000){
     timer = millis();
+    memcpy(aut_prev, aut_state, NUM_LEDS);
+    bright_t = 0;
     update_autom();
 
     if(autom_eras++ ==10){
