@@ -38,7 +38,6 @@ void loop() {
   else if(mode.equals("trif"))   trif();
   
   else if(mode.equals("line"))    line();
-  else if(mode.equals("stripes"))   stripes();
   else if(mode.equals("scroll_lines"))    scroll_lines();
   else if(mode.equals("waves"))   waves();
   else if(mode.equals("zig"))   zig();

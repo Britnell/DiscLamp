@@ -1,0 +1,6 @@
+-[ ] snake in random dir. rotation + mirror symm
+-[ ] laser lines crossing
+-[ ] moon / sphere shadow
+-[ ] clock real time from serial
+-[ ] fireplace
+-[ ] sunlight temp morning blue to cold white to warm white to red

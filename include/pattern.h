@@ -4,7 +4,7 @@
 #include "pixel.h"
 #include "lib.h"
 
-String mode = "square";
+String mode = "scroll_lines";
 #define HUE_DIFF 20
 
 unsigned short bright = 50;
@@ -395,58 +395,64 @@ void lines(){
 
 
 
-void stripes(){
-  int val;
-  float tmp;
+static float sl_angle = 0.0f;
+static float sl_width = 0.3f;
+static int   sl_n     = 0;
+static float sl_ang_v = 0.0f;
+static float sl_wid_v = 0.0f;
 
-  for(int l=0;l<NUM_LEDS;l++){
-    tmp = sin( (pixel[l].x + pixel[l].y) /1 );
-    val = int((tmp + 1) * 255);
+#define SL_MAX_ANGLE 0.785f
+#define SL_MIN_WIDTH 0.3f
+#define SL_MAX_WIDTH 0.167f
 
-    leds[l].setHSV( grad_hue(pixel[l].x, pixel[l].y) ,250,  val );
+void scroll_lines_tick() {
+  if (sl_n > 0) {
+    sl_angle += sl_ang_v;
+    if (sl_angle >  SL_MAX_ANGLE) sl_angle =  SL_MAX_ANGLE;
+    if (sl_angle < -SL_MAX_ANGLE) sl_angle = -SL_MAX_ANGLE;
+    sl_width += sl_wid_v;
+    if (sl_width > SL_MAX_WIDTH) sl_width = SL_MAX_WIDTH;
+    if (sl_width < SL_MIN_WIDTH) sl_width = SL_MIN_WIDTH;
+    sl_n--;
+  } else if (random(10) == 0) {
+    sl_n     = random(30, 80);
+    sl_ang_v = (random(2) ? 1.0f : -1.0f) * random(20, 60) * 0.0001f;
+    sl_wid_v = (random(2) ? 1.0f : -1.0f) * random(20, 60) * 0.0001f;
   }
-  FastLED.show();  
-
-  delay(100);
 }
 
-
 void scroll_lines(){
-  float q = 6.0;    // every Q repeat
-  float r = 0.3;    // 0.3*6 = true rad
-  
-  int val;
-  
+  float q = 6.0;
+  scroll_lines_tick();
+
   for(int l=0;l<NUM_LEDS;l++){
-    float p = 1.0 * (pixel[l].x + pixel[l].y / DY * 0.5 +f ) / q ;
+    float proj = cosf(sl_angle) * pixel[l].x + sinf(sl_angle) * pixel[l].y;
+    float p = (proj + f) / q;
     p = f_cap(p);
-    
+    int val;
+
     if(!invert){
       val = 0;
-      if(p>1-r)
-        val = int( linear(p, 1-r,1, 0,255 )  );
-      else if(p<r)
-        val = int( linear(p, 0,r, 255,0)  );
+      if(p > 1-sl_width)
+        val = int( linear(p, 1-sl_width, 1, 0, 255) );
+      else if(p < sl_width)
+        val = int( linear(p, 0, sl_width, 255, 0) );
     }
     else{
       val = 255;
-      if(p>1-r)
-        val = int( linear(p, 1-r,1, 255,0 )  );
-      else if(p<r)
-        val = int( linear(p, 0,r, 0,255)  );
+      if(p > 1-sl_width)
+        val = int( linear(p, 1-sl_width, 1, 255, 0) );
+      else if(p < sl_width)
+        val = int( linear(p, 0, sl_width, 0, 255) );
     }
-    
-    leds[l].setHSV( grad_hue(pixel[l].x, pixel[l].y) ,250,  val );
+
+    leds[l].setHSV( grad_hue(pixel[l].x, pixel[l].y), 250, val );
   }
-  FastLED.show();  
+  FastLED.show();
 
   f += 0.01;
-  // if(every(5)){
-  //   if(++d>=255)  d=0;
-  // }
-
   delay(20);
-} 
+}
 
 
 

@@ -18,12 +18,9 @@ void grad_tick() {
   if (grad_ang_n > 0) {
     grad_angle += grad_ang_v;
     grad_ang_n--;
-    // Serial.println(grad_angle); 
   } else if (random(10) == 0) {
     grad_ang_n = random(5, 20);
     grad_ang_v = (random(2) ? 1.0f : -1.0f) * (0.02f + random(0, 100) / 100.0f * 0.03f);
-    // Serial.print("grad angle impulse  n="); Serial.print(grad_ang_n);
-    // Serial.print(" v="); Serial.println(grad_ang_v);
   }
 
   if (grad_r_n > 0) {
@@ -34,8 +31,6 @@ void grad_tick() {
   } else if (random(10) == 0) {
     grad_r_n = random(5, 20);
     grad_r_v = (random(2) ? 1.0f : -1.0f) * (0.02f + random(0, 100) / 100.0f * 0.02f);
-    Serial.print("grad radius impulse  n="); Serial.print(grad_r_n);
-    Serial.print(" v="); Serial.println(grad_r_v);
   }
 }
 
