@@ -59,6 +59,7 @@ void print_ip(){
 void wifi_setup(){
   Serial.begin(115200);
   Serial1.begin(115200);
+  Serial.println("SEtUP==");
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
