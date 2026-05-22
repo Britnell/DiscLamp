@@ -88,7 +88,7 @@ void demo(){
 
     }
     FastLED.show();
-    delay(2);
+    delay(1);
   }
 }
 

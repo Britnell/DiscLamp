@@ -116,7 +116,7 @@ void snake_step(SNAKE &s) {
 
 void snake_reshuffle() {
     num_snakes   = (uint8_t)(random(2, SNAKE_MAX_COUNT+1));
-    snake_mirror = 3; //random(1,4);
+    snake_mirror = random(1,4);
     for(int s = 0; s < num_snakes; s++)
         snake_init(snakes[s], (uint8_t)(s * NUM_LEDS / num_snakes));
     p("snake reshuffle: n="); p(num_snakes);
