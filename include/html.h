@@ -27,7 +27,8 @@ const char * html = R"rawliteral(
   <script>
       document.addEventListener('alpine:init', () => {
         Alpine.data('lamp', () => ({
-          modes: ['full','half','square','triangle','cross','lines','hatch','hatch2','arrow','line','scroll_lines','waves','stripes','rain','hues','trif','autom','clock'],
+          modes: ['full','half','square','triangle','cross','lines','hatch','hatch2','arrow','line','scroll_lines','waves','stripes','rain','hues','trif','autom','clock','snake'],
+          mode: 'full',
           send(name, val) {
             fetch(`/set?${name}=${val}`).then(r => r.text()).then(console.log);
           },
@@ -40,6 +41,7 @@ const char * html = R"rawliteral(
           next() {
             const sel = this.$refs.mode;
             sel.selectedIndex = (sel.selectedIndex + 1) % sel.options.length;
+            this.mode = sel.value;
             this.send('m', sel.value);
           },
           cmd(ev) {
@@ -55,7 +57,7 @@ const char * html = R"rawliteral(
       <div><h2>PIXEL LAMP</h2></div>
       <div>
         <label>MODE</label>
-        <select name="m" x-ref="mode">
+        <select name="m" x-ref="mode" x-model="mode">
           <template x-for="m in modes" :key="m">
             <option :value="m" x-text="m"></option>
           </template>
@@ -70,7 +72,10 @@ const char * html = R"rawliteral(
         <label>Color </label>
         <input id="h" name="h" type="range" min="0" max="255" value="0" step="5" />
       </div>
-      <div>
+      <div x-show="mode === 'snake'">
+        <button @click="send('m', 'snake')">Shuffle</button>
+      </div>
+      <div x-show="mode !== 'snake'">
         <label>
           <input name="i" type="checkbox" />
           Invert
