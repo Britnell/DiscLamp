@@ -3,8 +3,8 @@
 #include "pixel.h"
 #include "serial.h"
 
-uint8_t h = 3;
-uint8_t m = 3;
+uint8_t h = 0;
+uint8_t m = 0;
 uint8_t s = 0;
 
 void tick(){

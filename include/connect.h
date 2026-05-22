@@ -6,6 +6,7 @@
 #include <ESP8266mDNS.h>
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
+#include <time.h>
 #include "html.h"
 // #include "pattern.h"
 #include "secrets.h"
@@ -56,6 +57,15 @@ void print_ip(){
   Serial.println(WiFi.localIP());
 }
 
+void send_time(){
+  time_t now = time(nullptr);
+  if(now < 100000) return; // NTP not synced yet
+  struct tm* t = localtime(&now);
+  char buf[20];
+  snprintf(buf, sizeof(buf), "t%02d:%02d:%02d", t->tm_hour, t->tm_min, t->tm_sec);
+  Serial1.println(buf);
+}
+
 void wifi_setup(){
   Serial.begin(115200);
   Serial1.begin(115200);
@@ -68,8 +78,13 @@ void wifi_setup(){
     delay(5000);
     ESP.restart();
   }
-  
+
   print_ip();
+
+  configTime(0, 0, "pool.ntp.org", "time.nist.gov");
+  // wait up to 5s for NTP sync
+  for(int i = 0; i < 50 && time(nullptr) < 100000; i++) delay(100);
+  send_time();
 
   //   ArduinoOTA.setHostname("LAMP-ESP");
   //   ArduinoOTA.setPassword("admin");
@@ -86,6 +101,11 @@ void wifi_setup(){
 
 void wifi_loop(){
     server.handleClient();
+    static int frame = 0;
+    if(++frame >= 1000){
+        frame = 0;
+        send_time();
+    }
 }
 
 #endif

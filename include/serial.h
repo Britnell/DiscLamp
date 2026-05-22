@@ -8,6 +8,8 @@
 
 void snake_reshuffle();
 
+extern uint8_t h, m, s;
+
 char pbuffer[100];
 String serial_in = "";
 
@@ -40,6 +42,13 @@ void cmd_line(String str){
         invert = str.toInt();
         p(" invert = ");
         pl(invert);
+        return;
+    }
+    if(cmd=='t'){
+        int th, tm, ts;
+        if(sscanf(str.c_str(), "%d:%d:%d", &th, &tm, &ts) == 3){
+            h = th; m = tm; s = ts;
+        }
         return;
     }
     pl(str);
