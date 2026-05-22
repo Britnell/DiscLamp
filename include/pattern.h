@@ -4,7 +4,7 @@
 #include "pixel.h"
 #include "lib.h"
 
-String mode = "scroll_lines";
+String mode = "snake";
 #define HUE_DIFF 20
 
 unsigned short bright = 50;

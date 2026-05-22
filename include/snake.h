@@ -1,0 +1,128 @@
+#pragma once
+#include <Arduino.h>
+#include "pattern.h"
+#include "pixel.h"
+
+#define NUM_SNAKES        2
+#define SNAKE_MAX_LEN     10
+#define SNAKE_MOVE_FRAMES 30
+#define SNAKE_TURN_PROB   30   // % chance to pick a new random direction each step
+
+// Mirror modes — every painted pixel is also drawn at its mirrored position
+#define MIRROR_NONE 0
+#define MIRROR_X    1   // flip horizontally (x -> -x)
+#define MIRROR_Y    2   // flip vertically   (y -> -y)
+uint8_t snake_mirror = MIRROR_X;
+
+typedef struct {
+    uint8_t body[SNAKE_MAX_LEN];  // [0]=head, [len-1]=tail; pixel indices
+    uint8_t len;
+    uint8_t dir;        // 0=left 1=right 2=up-R 3=up-L 4=dn-R 5=dn-L
+    uint8_t frame;      // counts 0..SNAKE_MOVE_FRAMES between steps
+    uint8_t next_head;  // pixel fading in this cycle
+    uint8_t old_tail;   // pixel fading out this cycle (only valid once len == SNAKE_MAX_LEN)
+} SNAKE;
+
+SNAKE snakes[NUM_SNAKES];
+bool  snake_init_done = false;
+
+
+// --- mirror helpers ---
+
+int snake_mirror_of(uint8_t idx) {
+    if(snake_mirror == MIRROR_NONE) return -1;
+    LED_STRUCT p = pixel[idx];
+    float mx = (snake_mirror == MIRROR_X) ? -p.x : p.x;
+    float my = (snake_mirror == MIRROR_Y) ? -p.y : p.y;
+    return find_pixel(mx, my);
+}
+
+void snake_paint(uint8_t idx, uint8_t h, uint8_t v) {
+    leds[idx].setHSV(h, 250, v);
+    int m = snake_mirror_of(idx);
+    if(m >= 0 && m != idx) leds[m].setHSV(h, 250, v);
+}
+
+
+// --- next-field lookup with edge wrapping ---
+
+int snake_next_field(uint8_t idx, uint8_t dir) {
+    LED_STRUCT pix = pixel[idx];
+    int n = -1;
+    switch(dir) {
+        case 0: if(idx > 0           && pixel[idx-1].row == pix.row) n = idx-1; break;
+        case 1: if(idx < NUM_LEDS-1  && pixel[idx+1].row == pix.row) n = idx+1; break;
+        case 2: n = find_pixel(pix.x+0.5f, pix.y+DY);  break;
+        case 3: n = find_pixel(pix.x-0.5f, pix.y+DY);  break;
+        case 4: n = find_pixel(pix.x+0.5f, pix.y-DY);  break;
+        case 5: n = find_pixel(pix.x-0.5f, pix.y-DY);  break;
+    }
+    if(n != -1) return n;
+
+    // wrap: left/right stay in same row, diagonals jump to antipodal pixel
+    if(dir == 0) { for(int l=NUM_LEDS-1; l>=0; l--) if(pixel[l].row==pix.row) return l; }
+    if(dir == 1) { for(int l=0; l<NUM_LEDS; l++)    if(pixel[l].row==pix.row) return l; }
+    float wx = -pix.x, wy = -pix.y;
+    int best = 0; float best_d = 9999.0f;
+    for(int l=0; l<NUM_LEDS; l++) {
+        float dx = pixel[l].x - wx, dy = pixel[l].y - wy;
+        float d  = dx*dx + dy*dy;
+        if(d < best_d) { best_d = d; best = l; }
+    }
+    return best;
+}
+
+
+// --- state machine ---
+
+void snake_init(SNAKE &s, uint8_t start) {
+    s.len       = 1;
+    s.body[0]   = start;
+    s.dir       = random(6);
+    s.frame     = 0;
+    s.next_head = (uint8_t)snake_next_field(start, s.dir);
+}
+
+void snake_step(SNAKE &s) {
+    s.old_tail = s.body[s.len-1];           // pixel about to drop (only used once at max len)
+    if(s.len < SNAKE_MAX_LEN) s.len++;
+    for(int i=s.len-1; i>0; i--) s.body[i] = s.body[i-1];
+    s.body[0] = s.next_head;
+
+    if(random(100) < SNAKE_TURN_PROB) s.dir = random(6);
+    s.next_head = (uint8_t)snake_next_field(s.body[0], s.dir);
+    s.frame = 0;
+}
+
+
+// --- render ---
+
+void snake_render(SNAKE &s, uint8_t h) {
+    uint8_t fade_in  = (uint8_t)(255UL * s.frame / SNAKE_MOVE_FRAMES);
+    uint8_t fade_out = 255 - fade_in;
+
+    // fading tail first so body pixels win on overlap
+    if(s.len == SNAKE_MAX_LEN) snake_paint(s.old_tail, h, fade_out);
+    snake_paint(s.next_head, h, fade_in);
+    for(int i=0; i<s.len; i++) snake_paint(s.body[i], h, 255);
+}
+
+void snake_loop() {
+    if(!snake_init_done) {
+        snake_init(snakes[0], 50);
+        snake_init(snakes[1], 100);
+        snake_init_done = true;
+    }
+
+    for(int l=0; l<NUM_LEDS; l++) leds[l] = CRGB::Black;
+
+    uint8_t snake_hues[NUM_SNAKES] = { (uint8_t)hue, (uint8_t)hue_a };
+    for(int s=0; s<NUM_SNAKES; s++) {
+        snakes[s].frame++;
+        if(snakes[s].frame >= SNAKE_MOVE_FRAMES) snake_step(snakes[s]);
+        snake_render(snakes[s], snake_hues[s]);
+    }
+
+    FastLED.show();
+    delay(20);
+}
