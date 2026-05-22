@@ -64,6 +64,13 @@ Three glowing blobs (at three hues spaced 120° apart on the colour wheel) drift
 ### `automaton`
 A hexagonal cellular automaton (hex Game of Life variant). Starts from a small seed cluster in the centre and evolves every 2 seconds using 3 neighbour-count rules chosen randomly. Live cells glow and colour-cycle between `hue` and `hue_a` (offset by 50); dead cells fade out gradually. If the pattern dies out or gets stuck in a loop, the automaton resets or picks new rules automatically.
 
+### `snake`
+Two snakes wander the hex grid simultaneously, each with its own hue (`hue` and `hue_a`). The head fades in and the tail fades out smoothly over each move cycle (`SNAKE_MOVE_FRAMES`). Each snake has a target length that drifts randomly over time (`SNAKE_VARY_PROB=10%`, range `SNAKE_MIN_LEN`–`SNAKE_MAX_LEN`), so snakes grow and shrink gradually. Direction changes randomly with `SNAKE_TURN_PROB`.
+
+**Symmetry:** controlled by `snake_mirror` — `MIRROR_NONE`, `MIRROR_X` (reflect horizontally, x → −x), or `MIRROR_Y` (reflect vertically, y → −y). When a mirror is active every painted pixel is also drawn at its mirrored position, so each snake appears as a symmetric twin pair. Only one axis at a time.
+
+---
+
 ### `clock`
 A binary clock. The seconds, minutes, and hours are each encoded as binary bits, with each bit shown as a symmetric pair of LEDs mirrored around a centre point on different horizontal rows:
 - Seconds: 6 bits around row centre (LED 75)

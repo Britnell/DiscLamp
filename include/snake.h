@@ -3,10 +3,12 @@
 #include "pattern.h"
 #include "pixel.h"
 
-#define NUM_SNAKES        2
-#define SNAKE_MAX_LEN     10
-#define SNAKE_MOVE_FRAMES 30
+#define SNAKE_MOVE_FRAMES 50
 #define SNAKE_TURN_PROB   30   // % chance to pick a new random direction each step
+#define SNAKE_VARY_PROB   10   // % chance to nudge target length up or down each step
+#define NUM_SNAKES         2
+#define SNAKE_MIN_LEN      5
+#define SNAKE_MAX_LEN     14
 
 // Mirror modes — every painted pixel is also drawn at its mirrored position
 #define MIRROR_NONE 0
@@ -17,10 +19,12 @@ uint8_t snake_mirror = MIRROR_X;
 typedef struct {
     uint8_t body[SNAKE_MAX_LEN];  // [0]=head, [len-1]=tail; pixel indices
     uint8_t len;
+    uint8_t target_len; // length the snake is trying to reach; len grows/shrinks toward this
     uint8_t dir;        // 0=left 1=right 2=up-R 3=up-L 4=dn-R 5=dn-L
     uint8_t frame;      // counts 0..SNAKE_MOVE_FRAMES between steps
     uint8_t next_head;  // pixel fading in this cycle
-    uint8_t old_tail;   // pixel fading out this cycle (only valid once len == SNAKE_MAX_LEN)
+    uint8_t old_tail;   // pixel fading out this cycle (only valid if dropped_tail)
+    bool    dropped_tail; // did this step drop a tail? (false while growing)
 } SNAKE;
 
 SNAKE snakes[NUM_SNAKES];
@@ -76,16 +80,29 @@ int snake_next_field(uint8_t idx, uint8_t dir) {
 // --- state machine ---
 
 void snake_init(SNAKE &s, uint8_t start) {
-    s.len       = 1;
-    s.body[0]   = start;
-    s.dir       = random(6);
-    s.frame     = 0;
-    s.next_head = (uint8_t)snake_next_field(start, s.dir);
+    s.len          = 1;
+    s.target_len   = SNAKE_MIN_LEN;
+    s.dir          = random(6);
+    s.body[0]      = start;
+    s.frame        = 0;
+    s.dropped_tail = false;
+    s.next_head    = (uint8_t)snake_next_field(start, s.dir);
 }
 
 void snake_step(SNAKE &s) {
-    s.old_tail = s.body[s.len-1];           // pixel about to drop (only used once at max len)
-    if(s.len < SNAKE_MAX_LEN) s.len++;
+    // randomly nudge target length within [MIN, MAX]
+    if(random(100) < SNAKE_VARY_PROB) {
+        if(random(2) && s.target_len < SNAKE_MAX_LEN)      s.target_len++;
+        else if(s.target_len > SNAKE_MIN_LEN)              s.target_len--;
+    }
+
+    // a tail drops whenever we're not growing (len >= target)
+    s.dropped_tail = (s.len >= s.target_len);
+    if(s.dropped_tail) s.old_tail = s.body[s.len-1];
+
+    if(s.len < s.target_len)      s.len++;   // grow
+    else if(s.len > s.target_len) s.len--;   // shrink
+
     for(int i=s.len-1; i>0; i--) s.body[i] = s.body[i-1];
     s.body[0] = s.next_head;
 
@@ -102,7 +119,7 @@ void snake_render(SNAKE &s, uint8_t h) {
     uint8_t fade_out = 255 - fade_in;
 
     // fading tail first so body pixels win on overlap
-    if(s.len == SNAKE_MAX_LEN) snake_paint(s.old_tail, h, fade_out);
+    if(s.dropped_tail) snake_paint(s.old_tail, h, fade_out);
     snake_paint(s.next_head, h, fade_in);
     for(int i=0; i<s.len; i++) snake_paint(s.body[i], h, 255);
 }
