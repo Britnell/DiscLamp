@@ -11,42 +11,45 @@ void fire() {
     fire_rdy = 1;
   }
 
-  // Seed bottom 3 rows with hot, flickering heat
+  // Seed bottom 2 rows with hot flickering base
   for (int l = 0; l < NUM_LEDS; l++) {
-    if (pixel[l].row >= N_ROWS - 3)
-      fh[l] = 148 + random(108);
+    if (pixel[l].row >= N_ROWS - 2)
+      fh[l] = 160 + random(96);
   }
 
-  // Diffuse heat upward: each LED averages hex-neighbours in the row below,
-  // with a small random lateral drift to break up straight columns
+  // Diffuse upward: each LED inherits from the single closest neighbour in the
+  // row below, shifted by a random lateral drift. Single-neighbour sampling
+  // (not averaging) preserves gaps → thin streaks. High-variance cooling means
+  // lucky streaks survive higher, unlucky ones die early.
   uint8_t nh[NUM_LEDS];
   for (int l = 0; l < NUM_LEDS; l++) {
     int r = pixel[l].row;
-    if (r >= N_ROWS - 3) {
+    if (r >= N_ROWS - 2) {
       nh[l] = fh[l];
       continue;
     }
 
-    float lx = pixel[l].x + (random(3) - 1) * 0.55f;
-    uint32_t sum = 0;
-    int cnt = 0;
+    float lx = pixel[l].x + (random(5) - 2) * 0.6f;
 
+    uint8_t best_heat = 0;
+    float   best_dx   = 99.0f;
     for (int n = 0; n < NUM_LEDS; n++) {
       if (pixel[n].row == r + 1) {
-        float dx = lx - pixel[n].x;
-        if (dx * dx < 1.3f) {
-          sum += fh[n];
-          cnt++;
+        float dx = fabsf(lx - pixel[n].x);
+        if (dx < best_dx) {
+          best_dx   = dx;
+          best_heat = fh[n];
         }
       }
     }
 
-    int v = cnt > 0 ? (int)(sum / cnt) - 5 - random(20) : 0;
+    // Range 12–46: high variance creates dark gaps between bright streaks
+    int v = (int)best_heat - 12 - random(35);
     nh[l] = v < 0 ? 0 : (uint8_t)v;
   }
   memcpy(fh, nh, NUM_LEDS);
 
-  // Map heat 0-255 to fire palette: black -> red -> orange -> yellow-white
+  // Fire palette: black -> red -> orange -> yellow-white
   for (int l = 0; l < NUM_LEDS; l++) {
     uint8_t h = fh[l];
     uint8_t hv, sat, val;
@@ -63,5 +66,5 @@ void fire() {
   }
 
   FastLED.show();
-  delay(35);
+  delay(60);
 }
