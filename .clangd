@@ -1,0 +1,15 @@
+CompileFlags:
+  Add:
+    - -x
+    - c++
+    - -std=c++17
+    - -DARDUINO=10816
+    - -DARDUINO_ESP8266_WEMOS_D1MINI
+    - -DESP8266
+    - -I/home/tommy/.platformio/packages/framework-arduinoespressif8266/cores/esp8266
+    - -I/home/tommy/.platformio/packages/framework-arduinoespressif8266/variants/d1_mini
+    - -I/home/tommy/.platformio/packages/toolchain-xtensa/xtensa-lx106-elf/include
+    - -I/home/tommy/.platformio/packages/toolchain-xtensa/lib/gcc/xtensa-lx106-elf/10.3.0/include
+    - -I/home/tommy/.platformio/packages/toolchain-xtensa/lib/gcc/xtensa-lx106-elf/10.3.0/include-fixed
+    - -Iinclude
+    - -Ilib
