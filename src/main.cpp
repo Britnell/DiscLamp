@@ -12,6 +12,7 @@
 #include "snake.h"
 // #include "fast.h"
 #include "moon.h"
+#include "fire.h"
 
 void setup() {
 
@@ -50,6 +51,7 @@ void loop() {
   else if(mode.equals("clock"))   clock_loop();
   else if(mode.equals("snake"))   snake_loop();
   else if(mode.equals("moon"))    moon();
+  else if(mode.equals("fire"))    fire();
 
   // else if(mode.equals("cross"))   cross();
   // else if(mode.equals("count"))    //   count();
