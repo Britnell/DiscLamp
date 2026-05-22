@@ -139,9 +139,10 @@ void snake_render(SNAKE &s, uint8_t h) {
 void snake_loop() {
     for(int l=0; l<NUM_LEDS; l++) leds[l] = CRGB::Black;
 
-    uint8_t snake_hues[3] = { (uint8_t)hue, (uint8_t)hue_a, (uint8_t)hue_b };
     for(int s=0; s<num_snakes; s++) {
-        uint8_t h = snake_hues[s % 3];
+        uint8_t h = hue;
+        if(s == 0 && num_snakes >= 2) h = hue_a;
+        if(s == 1 && num_snakes >= 3) h = hue_b;
         snakes[s].frame++;
         if(snakes[s].frame >= SNAKE_MOVE_FRAMES) snake_step(snakes[s]);
         snake_render(snakes[s], h);
