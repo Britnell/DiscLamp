@@ -4,7 +4,7 @@
 #include "pixel.h"
 #include "lib.h"
 
-String mode = "snake";
+String mode = "moon";
 
 #define HUE_DIFF 10
 unsigned short bright = 50;
