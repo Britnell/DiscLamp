@@ -57,9 +57,9 @@ void init_pixel(){
         led.row_i = rowleds-1-r;
       
       if(row%2==0)
-        led.x = -(x_offset + r );
+        led.x = (x_offset + r );
       else
-        led.x = -(x_offset + (rowleds-1) - r );
+        led.x = (x_offset + (rowleds-1) - r );
 
       led.y = - ( N_ROWS - 8 - row ) * DY;
 
