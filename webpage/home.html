@@ -2,118 +2,88 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
       body {
         color: white;
         background-color: black;
       }
-      container {
+      main {
         height: 100vh;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
       }
-      container div {
+      main div {
         margin-bottom: 20px;
       }
-      #dimmer {
-        width: 80vw;
-        max-width: 400px;
-      }
-      #hue {
+      #b, #h {
         width: 80vw;
         max-width: 400px;
       }
     </style>
+  <script>
+      document.addEventListener('alpine:init', () => {
+        Alpine.data('lamp', () => ({
+          modes: ['full','half','square','triangle','cross','lines','hatch','hatch2','arrow','line','scroll_lines','waves','stripes','rain','hues','trif','autom','clock'],
+          mode: 'full',
+          send(name, val) {
+            fetch(`/set?${name}=${val}`).then(r => r.text()).then(console.log);
+          },
+          handle(ev) {
+            const el = ev.target;
+            if (!el.name || el.name === 'cip') return;
+            const v = el.type === 'checkbox' ? (el.checked ? 1 : 0) : el.value;
+            this.send(el.name, v);
+          },
+          next() {
+            const sel = this.$refs.mode;
+            sel.selectedIndex = (sel.selectedIndex + 1) % sel.options.length;
+            this.mode = sel.value;
+            this.send('m', sel.value);
+          },
+          cmd(ev) {
+            const v = ev.target.elements.cip.value;
+            this.send(v[0], v.slice(1));
+          },
+        }));
+      });
+    </script>
   </head>
-  <body>
-    <container>
-      <div>
-        <h2>PIXEL LAMP</h2>
-      </div>
+  <body x-data="lamp" @input="handle($event)">
+    <main>
+      <div><h2>PIXEL LAMP</h2></div>
       <div>
         <label>MODE</label>
-        <select name="mode" id="mode" onchange="setmode(event)"></select>
-        <button onclick="nextmode()">Next</button>
+        <select name="m" x-ref="mode" x-model="mode">
+          <template x-for="m in modes" :key="m">
+            <option :value="m" x-text="m"></option>
+          </template>
+        </select>
+        <button @click="next()">Next</button>
       </div>
       <div>
         <label>DIM </label>
-        <input id="dimmer" type="range" min="0" max="100" value="50" step="5" />
+        <input id="b" name="b" type="range" min="0" max="100" value="50" step="5" />
       </div>
       <div>
         <label>Color </label>
-        <input id="hue" type="range" min="0" max="255" value="0" step="5" />
+        <input id="h" name="h" type="range" min="0" max="255" value="0" step="5" />
       </div>
-      <div>
+      <div x-show="mode !== 'snake'">
         <label>
-          <input id="invert" type="checkbox" />
+          <input name="i" type="checkbox" />
           Invert
         </label>
       </div>
       <div>
-        <form id="cmd">
+        <form @submit.prevent="cmd($event)">
           <label>CMD</label>
           <input name="cip" type="text" />
           <button>>></button>
         </form>
       </div>
-    </container>
-    <script>
-      const set = (m, v) =>
-        fetch(`/set?${m}=${v}`)
-          .then((res) => res.text())
-          .then(console.log);
-      const modes = [
-        "full",
-        "half",
-        "square",
-        "triangle",
-        "cross",
-        "lines",
-        "hatch",
-        "hatch2",
-        "arrow",
-        "line",
-        "scroll_lines",
-        "waves",
-        "stripes",
-        "rain",
-        "hues",
-        "trif",
-        "autom",
-        "clock",
-      ];
-      const mode = document.getElementById("mode");
-      const dimmer = document.getElementById("dimmer");
-      const hue = document.getElementById("hue");
-      const invert = document.getElementById("invert");
-      const cmd = document.getElementById("cmd");
-
-      mode.onchange = (ev) => set("m", ev.target.value);
-      dimmer.oninput = (ev) => set("b", ev.target.value);
-      hue.oninput = (ev) => set("h", ev.target.value);
-      invert.onchange = (ev) => set("i", ev.target.checked ? 1 : 0);
-
-      function nextmode() {
-        let s = mode.selectedIndex + 1;
-        if (s >= mode.options.length) s = 0;
-        mode.selectedIndex = s;
-        set("m", mode.value);
-      }
-
-      modes.forEach((m) => {
-        const el = document.createElement("option");
-        el.value = m;
-        el.textContent = m;
-        mode.appendChild(el);
-      });
-
-      cmd.onsubmit = (ev) => {
-        ev.preventDefault();
-        const v = ev.target.elements.cip.value;
-        set(v[0], v.slice(1));
-      };
-    </script>
+    </main>
   </body>
 </html>
