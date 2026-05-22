@@ -5,8 +5,8 @@
 #include "lib.h"
 
 String mode = "snake";
-#define HUE_DIFF 20
 
+#define HUE_DIFF 10
 unsigned short bright = 50;
 unsigned short hue = 1;
 unsigned short hue_a = hue + HUE_DIFF;

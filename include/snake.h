@@ -3,18 +3,19 @@
 #include "pattern.h"
 #include "pixel.h"
 
-#define SNAKE_MOVE_FRAMES 50
-#define SNAKE_TURN_PROB   30   // % chance to pick a new random direction each step
-#define SNAKE_VARY_PROB   10   // % chance to nudge target length up or down each step
-#define NUM_SNAKES         2
-#define SNAKE_MIN_LEN      5
-#define SNAKE_MAX_LEN     14
+#define SNAKE_MOVE_FRAMES  50
+#define SNAKE_TURN_PROB    30   // % chance to pick a new random direction each step
+#define SNAKE_VARY_PROB    10   // % chance to nudge target length up or down each step
+#define SNAKE_MAX_COUNT     4   // maximum number of simultaneous snakes
+#define SNAKE_MIN_LEN       5
+#define SNAKE_MAX_LEN      14
 
 // Mirror modes — every painted pixel is also drawn at its mirrored position
 #define MIRROR_NONE 0
 #define MIRROR_X    1   // flip horizontally (x -> -x)
 #define MIRROR_Y    2   // flip vertically   (y -> -y)
 uint8_t snake_mirror = MIRROR_X;
+uint8_t num_snakes   = 2;
 
 typedef struct {
     uint8_t body[SNAKE_MAX_LEN];  // [0]=head, [len-1]=tail; pixel indices
@@ -27,8 +28,7 @@ typedef struct {
     bool    dropped_tail; // did this step drop a tail? (false while growing)
 } SNAKE;
 
-SNAKE snakes[NUM_SNAKES];
-bool  snake_init_done = false;
+SNAKE snakes[SNAKE_MAX_COUNT];
 
 
 // --- mirror helpers ---
@@ -112,6 +112,18 @@ void snake_step(SNAKE &s) {
 }
 
 
+// --- reshuffle: called every time the mode is selected ---
+
+void snake_reshuffle() {
+    num_snakes   = (uint8_t)(random(2, SNAKE_MAX_COUNT+1));
+    snake_mirror = random(1,3);
+    for(int s = 0; s < num_snakes; s++)
+        snake_init(snakes[s], (uint8_t)(s * NUM_LEDS / num_snakes));
+    p("snake reshuffle: n="); p(num_snakes);
+    p(" mirror="); pl(snake_mirror == MIRROR_X ? "H" : "V");
+}
+
+
 // --- render ---
 
 void snake_render(SNAKE &s, uint8_t h) {
@@ -125,19 +137,14 @@ void snake_render(SNAKE &s, uint8_t h) {
 }
 
 void snake_loop() {
-    if(!snake_init_done) {
-        snake_init(snakes[0], 50);
-        snake_init(snakes[1], 100);
-        snake_init_done = true;
-    }
-
     for(int l=0; l<NUM_LEDS; l++) leds[l] = CRGB::Black;
 
-    uint8_t snake_hues[NUM_SNAKES] = { (uint8_t)hue, (uint8_t)hue_a };
-    for(int s=0; s<NUM_SNAKES; s++) {
+    uint8_t snake_hues[3] = { (uint8_t)hue, (uint8_t)hue_a, (uint8_t)hue_b };
+    for(int s=0; s<num_snakes; s++) {
+        uint8_t h = snake_hues[s % 3];
         snakes[s].frame++;
         if(snakes[s].frame >= SNAKE_MOVE_FRAMES) snake_step(snakes[s]);
-        snake_render(snakes[s], snake_hues[s]);
+        snake_render(snakes[s], h);
     }
 
     FastLED.show();

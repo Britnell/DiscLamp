@@ -17,7 +17,7 @@ void setup() {
   Serial.begin(115200);
 
   init_pixel();
-  
+  snake_reshuffle();
   demo();
   Serial.println(" ready");
 }

@@ -6,6 +6,8 @@
 #include "lib.h"
 #include "pixel.h"
 
+void snake_reshuffle();
+
 char pbuffer[100];
 String serial_in = "";
 
@@ -14,6 +16,7 @@ void cmd_line(String str){
     str.remove(0,1);
     if(cmd=='m'){
         mode = str;
+        if(str.equals("snake")) snake_reshuffle();
         p(" mode = ");
         pl(str);
         return;
