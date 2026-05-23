@@ -82,6 +82,8 @@ void wifi_setup(){
 
   print_ip();
 
+  MDNS.begin("lamp");
+
   configTime("CET-1CEST,M3.5.0,M10.5.0/3", "pool.ntp.org", "time.nist.gov");
   // wait up to 5s for NTP sync
   for(int i = 0; i < 50 && time(nullptr) < 100000; i++) delay(100);
@@ -101,6 +103,7 @@ void wifi_setup(){
 
 
 void wifi_loop(){
+    MDNS.update();
     server.handleClient();
     static unsigned long last_time_send = 0;
     unsigned long now_ms = millis();
