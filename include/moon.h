@@ -10,9 +10,13 @@
 // How far past pure-new we begin showing a crescent (radians).
 // Smaller => deeper dark dip near new moon.
 #define MOON_NEW_OFFSET  0.45f
-// How far before pure-full we cut over to the overlap transition (radians).
-// Smaller => longer time spent looking fully lit.
-#define MOON_FULL_OFFSET 0.55f
+// Full-moon overlap window half-width (radians). Larger => overlap starts
+// earlier / ends later. Boundaries are continuous regardless.
+#define MOON_FULL_OFFSET 0.40f
+// How far the two halves diverge at the midpoint of the full-moon overlap
+// (radians). Larger => darker slivers at the limbs, moon never looks fully
+// lit. 0 => identical to single-draw (no effect).
+#define MOON_FULL_SKEW   0.50f
 
 // Cycle position in radians, 0..2*PI. Starts past the new-moon dead zone.
 float moon_phase_angle = MOON_NEW_OFFSET;
@@ -52,13 +56,16 @@ void moon() {
     draw_moon(t, 0);
   }
   else if(t < M_PI + FO) {
-    // full-moon overlap: left half is finishing its waxing fill,
-    // right half has already started waning (dark sliver appearing)
-    float w  = (t - (M_PI - FO)) / (2.0f * FO);   // 0..1 across the window
-    float lp = M_PI - FO * (1.0f - w);            // approaches PI
-    float rp = M_PI + FO * w;                     // departs from PI
-    draw_moon(lp, -1);
-    draw_moon(rp, +1);
+    // Full-moon overlap. base sweeps π-FO -> π+FO so the boundaries match
+    // the single-draw phase exactly (no jump). In the middle the two halves
+    // diverge by `skew`, so the left half lags toward "still waxing" and
+    // the right half leads toward "already waning" -- both showing a dark
+    // sliver at their outer limb.
+    float w    = (t - (M_PI - FO)) / (2.0f * FO);     // 0..1
+    float base = (M_PI - FO) + 2.0f * FO * w;
+    float skew = MOON_FULL_SKEW * sinf((float)M_PI * w);
+    draw_moon(base - skew, -1);
+    draw_moon(base + skew, +1);
   }
   else if(t < 2.0f * M_PI - NO) {
     // pure waning gibbous/crescent

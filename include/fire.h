@@ -2,11 +2,11 @@
 #include "pattern.h"
 #include "pixel.h"
 
-static const uint8_t FIRE_STEPS    = 60; 
+static const uint8_t FIRE_STEPS    = 52; 
 static const uint8_t FIRE_SPAWN    = 25;  // % chance to seed an ember in bottom rows
 static const uint8_t FIRE_COOL_MIN = 5;   // cooling as heat rises
-static const uint8_t FIRE_COOL_MAX = 61;  
-static const uint8_t FIRE_BOT_COOL = 14; 
+static const uint8_t FIRE_COOL_MAX = 50;  
+static const uint8_t FIRE_BOT_COOL = 25; 
 static const uint8_t FIRE_HUE_MAX  = 20; 
 
 static uint8_t fh[NUM_LEDS];       // current sim state (target)
