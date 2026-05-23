@@ -39,12 +39,7 @@ void loop() {
   else if(mode.equals("circle"))    circle();
   
   else if(mode.equals("lines"))   lines();
-  else if(mode.equals("hatch"))   hatch();
-  else if(mode.equals("hatch2"))    hatch2();
-  else if(mode.equals("arrow"))   arrow();
-  else if(mode.equals("trif"))   trif();
-  
-  else if(mode.equals("line"))    line();
+
   else if(mode.equals("scroll_lines"))    scroll_lines();
   else if(mode.equals("waves"))   waves();
   else if(mode.equals("zig"))   zig();
