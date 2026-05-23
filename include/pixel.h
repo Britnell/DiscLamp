@@ -66,7 +66,7 @@ void init_pixel(){
         
       led.y = - ( N_ROWS - 8 - row ) * DY;
       led.hx = (int8_t)round(led.x * 2);
-      led.hy = (int8_t)(N_ROWS / 2 - row);
+      led.hy = (int8_t)(row - N_ROWS / 2);
       
       // Serial.printf("\t li-%d [%f,%f] [%d,%d] \n",led_index,r,led.x,led.y,led.hx,led.hy);
 

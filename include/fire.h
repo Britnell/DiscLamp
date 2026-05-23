@@ -11,10 +11,14 @@ void fire() {
     fire_rdy = 1;
   }
 
-  // Seed bottom 2 rows with hot flickering base
+  // Seed bottom 2 rows sparsely — ~35% of pixels lit to create distinct streaks
   for (int l = 0; l < NUM_LEDS; l++) {
-    if (pixel[l].row >= N_ROWS - 2)
-      fh[l] = 160 + random(96);
+    if (pixel[l].row >= N_ROWS - 2) {
+      if (random(100) < 35)
+        fh[l] = 170 + random(86);
+      else
+        fh[l] = fh[l] > 8 ? fh[l] - 8 : 0;  // let unlit pixels cool
+    }
   }
 
   // Diffuse upward: each LED inherits from the single closest neighbour in the
@@ -43,28 +47,28 @@ void fire() {
       }
     }
 
-    // Range 12–46: high variance creates dark gaps between bright streaks
-    int v = (int)best_heat - 12 - random(35);
+    // Range 6–60: wide variance — lucky streaks climb much higher, unlucky ones die fast
+    int v = (int)best_heat - 6 - random(55);
     nh[l] = v < 0 ? 0 : (uint8_t)v;
   }
   memcpy(fh, nh, NUM_LEDS);
 
-  // Fire palette: black -> red -> orange -> yellow-white
+  // Fire palette: black -> red -> orange -> yellow (no white)
   for (int l = 0; l < NUM_LEDS; l++) {
     uint8_t h = fh[l];
     uint8_t hv, sat, val;
     if (h < 85) {
       hv = 0; sat = 255; val = map(h, 0, 84, 0, 255);
     } else if (h < 170) {
-      hv = map(h, 85, 169, 0, 28); sat = 255; val = 255;
+      hv = map(h, 85, 169, 0, 36); sat = 255; val = 255;
     } else {
-      hv  = map(h, 170, 255, 28, 48);
-      sat = map(h, 170, 255, 255, 80);
+      hv  = map(h, 170, 255, 36, 60);  // orange to yellow
+      sat = 255;                         // stay saturated, no white
       val = 255;
     }
     leds[l].setHSV(hv, sat, val);
   }
 
   FastLED.show();
-  delay(60);
+  delay(110);
 }

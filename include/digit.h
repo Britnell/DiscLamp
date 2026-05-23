@@ -5,88 +5,49 @@
 
 typedef struct { int8_t r; int8_t c; } Cell;
 
-// find LED index by (row, col-within-row), returns -1 if not found
-int find_ij(int row, int col) {
-  for (int l = 0; l < NUM_LEDS; l++) {
-    if (pixel[l].row == row && pixel[l].row_i == col)
-      return l;
-  }
-  return -1;
-}
-
-// draw an array of cells at origin (or, oc), with given hue
-void draw_cells(Cell* cells, int n, int or_, int oc, uint8_t h, uint8_t s, uint8_t v) {
+// draw cells using hex grid coords — origin is hx/hy (0,0 = center)
+void draw_cells(Cell* cells, int n, int8_t ohx, int8_t ohy, uint8_t h, uint8_t s, uint8_t v) {
   for (int i = 0; i < n; i++) {
-    int l = find_ij(or_ + cells[i].r, oc + cells[i].c);
-    if (l >= 0) leds[l].setHSV(h, s, v);
+    int8_t thx = ohx + cells[i].c * 2 + (cells[i].r % 2 != 0 ? 1 : 0);
+    int8_t thy = ohy - cells[i].r;
+    for (int l = 0; l < NUM_LEDS; l++) {
+      if (pixel[l].hx == thx && pixel[l].hy == thy) {
+        leds[l].setHSV(h, s, v); break;
+      }
+    }
   }
 }
 
-Cell digit8[] = {
-  {0,1},{0,2},
-  {1,0},{1,2},
-  {2,1},{2,2},
-  {3,0},{3,2},
-  {4,1},{4,2},
-};
 
-Cell digit1[] = {
-  {0,0},
-  {1,0},
-  {2,1},
-  {3,0},
-  {4,0}
-};
-
-Cell digit2[] = {
-  {4,1},{4,0},
-  {3,0},
-  {2,1},{2,0},
-  {1,2},
-  {0,2},{0,1},
-};
-
-Cell digit3[] = {
-  {4,1},{4,0},
-  {3,0},
-  {2,1},{2,0},
-  {1,0},
-  {0,1},{0,0},
-};
-
-Cell digit4[] = {
-  {4,2},{4,0},
-  {3,2},{3,0},
-  {2,2},{2,1},{2,0},
-  {1,0},
-  {0,0},
-};
-
-Cell digit5[] = {
-  {4,2},{4,1},
-  {3,2},
-  {2,2},{2,1},
-  {1,0},
-  {0,2},{0,1},
-};
-
-void draw8(int row, int col, uint8_t h) {
-  draw_cells(digit8, 10, row, col, h, 250, 255);
+void draw8(int8_t hx, int8_t hy, uint8_t h) {
+  Cell digit8[] = {
+    {0,1},{0,2},
+    {1,0},{1,2},
+    {2,1},{2,2},
+    {3,0},{3,2},
+    {4,1},{4,2},
+  };
+  draw_cells(digit8, 10, hx, hy, h, 250, 255);
 }
-void draw1(int row, int col, uint8_t h) {
-  draw_cells(digit1, 5, row, col, h, 250, 255);
+void draw3(int8_t hx, int8_t hy, uint8_t h) {
+  Cell cells[] = { {0,1},{0,2}, {1,0}, {2,1},{2,2}, {3,0}, {4,1},{4,2} };
+  draw_cells(cells, 8, hx, hy, h, 250, 255);
 }
-void draw2(int row, int col, uint8_t h) {
-  draw_cells(digit2, 7, row, col, h, 250, 255);
+void draw1(int8_t hx, int8_t hy, uint8_t h) {
+  Cell cells[] = { {0,0}, {1,0}, {2,1}, {3,0}, {4,0} };
+  draw_cells(cells, 5, hx, hy, h, 250, 255);
 }
-void draw3(int row, int col, uint8_t h) {
-  draw_cells(digit3, 7, row, col, h, 250, 255);
+void draw2(int8_t hx, int8_t hy, uint8_t h) {
+  Cell cells[] = { {4,1},{4,0}, {3,0}, {2,1},{2,0}, {1,2}, {0,2},{0,1} };
+  draw_cells(cells, 7, hx, hy, h, 250, 255);
 }
-void draw4(int row, int col, uint8_t h) {
-  draw_cells(digit4, 9, row, col, h, 250, 255);
+void draw4(int8_t hx, int8_t hy, uint8_t h) {
+  Cell cells[] = { {4,2},{4,0}, {3,2},{3,0}, {2,2},{2,1},{2,0}, {1,0}, {0,0} };
+  draw_cells(cells, 9, hx, hy, h, 250, 255);
 }
-void draw5(int row, int col, uint8_t h) {
-  draw_cells(digit5, 7, row, col, h, 250, 255);
+void draw5(int8_t hx, int8_t hy, uint8_t h) {
+  Cell cells[] = { {4,2},{4,1}, {3,2}, {2,2},{2,1}, {1,0}, {0,2},{0,1} };
+  draw_cells(cells, 7, hx, hy, h, 250, 255);
 }
 
 static int digit_frame = 0;
@@ -94,9 +55,9 @@ static int digit_frame = 0;
 void digit_loop() {
   if (digit_frame == 0) {
     for (int l = 0; l < NUM_LEDS; l++) leds[l] = CRGB::Black;
-    // draw1(3, 0,  hue);
-    draw8(2,2, hue);
-    // draw3(5, 4,  hue);
+    draw8(-5,-1,  hue);
+    // draw8(0,0, hue);
+    // draw3(6,6,  hue);
     // draw4(5, 8,  hue);
     // draw5(5, 12, hue);
     FastLED.show();
