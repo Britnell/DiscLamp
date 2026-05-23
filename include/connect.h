@@ -63,6 +63,7 @@ void send_time(){
   struct tm* t = localtime(&now);
   char buf[20];
   snprintf(buf, sizeof(buf), "t%02d:%02d:%02d", t->tm_hour, t->tm_min, t->tm_sec);
+  Serial.printf(" TIME %02d:%02d:%02d  \n",t->tm_hour, t->tm_min, t->tm_sec);
   Serial1.println(buf);
 }
 
@@ -81,7 +82,7 @@ void wifi_setup(){
 
   print_ip();
 
-  configTime(0, 0, "pool.ntp.org", "time.nist.gov");
+  configTime("CET-1CEST,M3.5.0,M10.5.0/3", "pool.ntp.org", "time.nist.gov");
   // wait up to 5s for NTP sync
   for(int i = 0; i < 50 && time(nullptr) < 100000; i++) delay(100);
   send_time();
@@ -101,9 +102,10 @@ void wifi_setup(){
 
 void wifi_loop(){
     server.handleClient();
-    static int frame = 0;
-    if(++frame >= 1000){
-        frame = 0;
+    static unsigned long last_time_send = 0;
+    unsigned long now_ms = millis();
+    if(now_ms - last_time_send >= 10000){
+        last_time_send = now_ms;
         send_time();
     }
 }
