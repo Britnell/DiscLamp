@@ -5,3 +5,9 @@
 -[ ] sunlight temp morning blue to cold white to warm white to red
 -[ ] laser lines crossing
 -[ ] zap - lines / stripes of 
+-[ ] circle - actually round and fade instead of hard edge + slight slow breathing over 6s?
+-[ ] scroll_lines dont randomize angle as quickly, maybe move lines tiny bit more quickly
+-[ ] rain, vary particle size and count, can have fewer larger or more smaller ones. maybe as extra variable slider 'custom' that sends value forcertain patterns only
+-[ ] hue - when hue is read use colB -70 so its blue not green
+-[ ] html.h - autom should show shuffle button
+-[ ] moon - start at larger angle so its not completely off, and actually maybe as it fades out on the left it should be fading in on the right, so for smaller angles we would draw it twice. also for fullmoon, make the full moon shorter, we dont want the entire lamp light up for as long, as soon as the full moon is completing on the left it should start waning on the right. we might need to adjust the draw fn to give use this control.  or just have it so it can be called twice, once for left and once for right half or so

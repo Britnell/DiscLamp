@@ -51,11 +51,4 @@ void draw_ring(uint8_t r){
     }
 }
 
-void ring() {
-  fill_solid(leds, NUM_LEDS, CRGB::Black);
-  draw_ring(0);
-  FastLED.show();
-  delay(1000);
-}
-
 #endif

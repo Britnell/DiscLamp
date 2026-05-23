@@ -4,7 +4,7 @@
 #include "pixel.h"
 #include "lib.h"
 
-String mode = "ring";
+String mode = "secrings";
 
 #define HUE_DIFF 10
 unsigned short bright = 50;
