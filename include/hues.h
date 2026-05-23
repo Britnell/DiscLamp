@@ -43,7 +43,7 @@ float get_dist(float xa, float ya, float xb, float yb){
 
 void draw_hues(){
     uint8_t ha = hue;
-    uint8_t hb = hue = 256 - 85;   // 1/3
+    uint8_t hb = hue + 256 - 85;   // 1/3
     uint8_t hc = hue + 127;  // 1/2
 
     float dist;
