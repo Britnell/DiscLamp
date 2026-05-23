@@ -11,12 +11,14 @@
 #define N_ROWS 15
 
 typedef struct {
-  uint8_t l;    // actual led-string index
-  uint8_t row;     // index row [vertical] 
-  uint8_t row_i;      // array index in row
-  uint8_t row_leds;   // leds in row
+  uint8_t l;        // actual led-string index
+  uint8_t row;      // index row [vertical]
+  uint8_t row_i;    // array index in row
+  uint8_t row_leds; // leds in row
   float x;
   float y;
+  int8_t hx;  // hex grid x *2 (same-row step=±2, diagonal step=±1)
+  int8_t hy;  // hex grid y (row step=±1, 0=center, positive=up)
 } LED_STRUCT;
 
 CRGB leds[NUM_LEDS];
@@ -42,7 +44,8 @@ void init_pixel(){
     else
       x_offset = - (rowleds/2) ;
       
-    
+    // Serial.printf("row %d / %d \n ",row,rowleds);
+
     for(uint8_t r=0;r<rowleds;r++){
       
       // struct
@@ -52,16 +55,20 @@ void init_pixel(){
       led.row = row;
       led.row_leds = rowleds;
       if(row%2==0)
-        led.row_i = r;
+      led.row_i = r;
       else
-        led.row_i = rowleds-1-r;
+      led.row_i = rowleds-1-r;
       
       if(row%2==0)
-        led.x = (x_offset + r );
-      else
-        led.x = (x_offset + (rowleds-1) - r );
-
+        led.x = -(x_offset + r );
+        else
+        led.x = -(x_offset + (rowleds-1) - r );
+        
       led.y = - ( N_ROWS - 8 - row ) * DY;
+      led.hx = (int8_t)round(led.x * 2);
+      led.hy = (int8_t)(N_ROWS / 2 - row);
+      
+      // Serial.printf("\t li-%d [%f,%f] [%d,%d] \n",led_index,r,led.x,led.y,led.hx,led.hy);
 
       // insert
       pixel[led_index] = led;
