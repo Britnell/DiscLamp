@@ -15,6 +15,7 @@
 #include "moon.h"
 #include "fire.h"
 #include "digit.h"
+#include "ring.h"
 
 void setup() {
 
@@ -56,6 +57,7 @@ void loop() {
   else if(mode.equals("moon"))    moon();
   else if(mode.equals("fire"))    fire();
   else if(mode.equals("digit"))   digit_loop();
+  else if(mode.equals("ring"))    ring();
 
   // else if(mode.equals("cross"))   cross();
   // else if(mode.equals("count"))    //   count();
