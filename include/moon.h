@@ -16,12 +16,15 @@
 
 // Base phase step per frame.
 #define MOON_STEP_BASE   0.008f
-// Extra step multiplier near full moon. Larger => full moon passes quicker.
-#define MOON_STEP_FAST   1.5f
+// Step per frame at full moon (d = 0). Larger => full moon passes quicker.
+#define MOON_STEP_FAST   0.022f
 // Half-width (radians) of the fast zone around π.
-#define MOON_FAST_WIDTH  2.0f
+#define MOON_FAST_WIDTH  1.0f
+// How early (radians before 2π) to start measuring speed against the
+// next cycle's phase. The old moon is essentially gone by here.
+#define MOON_SPEED_SWITCH 3.5f
 
-float moon_phase_angle = MOON_NEW_OFFSET;
+float moon_phase_angle = 1.0f;
 
 // Only writes lit pixels. Multiple calls layer additively (later wins
 // brighter pixel).
@@ -60,9 +63,24 @@ void moon() {
 
   FastLED.show();
 
-  // Step faster around full moon to shorten the full phase.
+  // Step faster around full moon to shorten the full phase. Speed lerps
+  // linearly from STEP_BASE at the edge of the fast zone to STEP_FAST at π.
   float step = MOON_STEP_BASE;
-  if(fabsf(t - (float)M_PI) < MOON_FAST_WIDTH) step *= MOON_STEP_FAST;
+  // Symmetric distance from full moon (t = π). Ramps up approaching π
+  // and back down after, then stays at BASE for the rest of the cycle
+  // and the new cycle's wax until it nears π again.
+  float d = fabsf(t - (float)M_PI);
+  if(d < MOON_FAST_WIDTH) {
+    float k = 1.0f - (d / MOON_FAST_WIDTH);
+    step = MOON_STEP_BASE + (MOON_STEP_FAST - MOON_STEP_BASE) * k;
+  }
+  Serial.print("moon phase=");
+  Serial.print(t, 3);
+  Serial.print(" d=");
+  Serial.print(d, 3);
+  Serial.print(" step=");
+  Serial.println(step, 5);
+
   moon_phase_angle += step;
 
   // At t = 2π the old cycle is fully dead and the new cycle is at phase
