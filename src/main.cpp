@@ -9,6 +9,7 @@
 #include "hues.h"
 #include "zig.h"
 #include "clock.h"
+#include "binaryclock.h"
 #include "snake.h"
 // #include "fast.h"
 #include "moon.h"
@@ -50,6 +51,7 @@ void loop() {
   else if(mode.equals("hues"))    hues();
   else if(mode.equals("autom"))   automaton();
   else if(mode.equals("clock"))   clock_loop();
+  else if(mode.equals("binaryclock"))   binaryclock_loop();
   else if(mode.equals("snake"))   snake_loop();
   else if(mode.equals("moon"))    moon();
   else if(mode.equals("fire"))    fire();

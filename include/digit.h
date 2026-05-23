@@ -29,6 +29,16 @@ void draw8(int8_t hx, int8_t hy, uint8_t h) {
   };
   draw_cells(digit8, 10, hx, hy, h, 250, 255);
 }
+void draw0(int8_t hx, int8_t hy, uint8_t h) {
+  Cell digit8[] = {
+    {1,4},{2,4},
+    {0,3},{2,3},
+    {0,2},{3,2},
+    {0,1},{2,1},
+    {1,0},{2,0},
+  };
+  draw_cells(digit8, 10, hx, hy, h, 250, 255);
+}
 void draw2(int8_t hx, int8_t hy, uint8_t h) {
   Cell cells[] = {
     {1,4},{2,4},

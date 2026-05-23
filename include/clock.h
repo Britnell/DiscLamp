@@ -1,10 +1,16 @@
+#ifndef CLOCK_H
+#define CLOCK_H
+
+#define CLOCK_DEBUG 0  // 1 = show mm:ss, 0 = show hh:mm
+
 #include <Arduino.h>
 #include "pattern.h"
 #include "pixel.h"
 #include "serial.h"
+#include "digit.h"
 
-uint8_t h = 0;
-uint8_t m = 0;
+uint8_t h = 10;
+uint8_t m = 23;
 uint8_t s = 0;
 
 void tick(){
@@ -17,40 +23,38 @@ void tick(){
     h = 1;
 }
 
-void clock_1(){
-  uint8_t val, l, b;
-  for(l=0; l<NUM_LEDS; l++){
-    leds[l] = CRGB(0,0,0);
+void draw_digit(uint8_t d, int8_t hx, int8_t hy, uint8_t col) {
+  switch(d) {
+    case 0: draw0(hx, hy, col); break;
+    case 1: draw1(hx, hy, col); break;
+    case 2: draw2(hx, hy, col); break;
+    case 3: draw3(hx, hy, col); break;
+    case 4: draw4(hx, hy, col); break;
+    case 5: draw5(hx, hy, col); break;
+    case 6: draw6(hx, hy, col); break;
+    case 7: draw7(hx, hy, col); break;
+    case 8: draw8(hx, hy, col); break;
+    case 9: draw9(hx, hy, col); break;
   }
-  for(b=0; b<6; b++){
-    val = (s & (0x01 << b )) ? 255 : 0;
-    leds[75-b].setHSV(hue,250,val);
-    leds[75+b].setHSV(hue,250,val);
-
-    val = (m & (0x01 << b )) ? 255 : 0;
-    leds[100-b].setHSV(hue,250,val);
-    leds[100+b].setHSV(hue,250,val);
-    leds[50-b].setHSV(hue,250,val);
-    leds[50+b].setHSV(hue,250,val);
-
-    if(b<4) {
-    val = (h & (0x01 << b )) ? 255 : 0;
-    leds[26-b].setHSV(hue,250,val);
-    leds[26+b].setHSV(hue,250,val);
-    leds[124-b].setHSV(hue,250,val);
-    leds[124+b].setHSV(hue,250,val);
-    }
-  }
-  FastLED.show();  
 }
-
-
 
 void clock_loop(){
     if(millis()-timer >= 1000){
         timer = millis();
         tick();
-        clock_1();
+
+        for (int l = 0; l < NUM_LEDS; l++) leds[l] = CRGB::Black;
+
+        uint8_t a = CLOCK_DEBUG ? m : h;
+        uint8_t b = CLOCK_DEBUG ? s : m;
+
+        draw_digit(a / 10, -7, 1,  hue);
+        draw_digit(a % 10,  1, 1,  hue);
+        draw_digit(b / 10, -7, -5, hue);
+        draw_digit(b % 10,  1, -5, hue);
+
+        FastLED.show();
     }
-    // delay(2);
 }
+
+#endif
