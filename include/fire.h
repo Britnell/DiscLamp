@@ -35,35 +35,37 @@ void fire() {
     }
   }
 
-  // Diffuse upward: each LED inherits from the single closest neighbour in the
-  // row below, shifted by a random lateral drift. Single-neighbour sampling
-  // (not averaging) preserves gaps → thin streaks. High-variance cooling means
-  // lucky streaks survive higher, unlucky ones die early.
+  // Push heat upward: each cell splits its heat between its two upper hex
+  // neighbours by a random ratio (p / 100-p). Upper cells accumulate from
+  // both their below-children, then cool. Total heat per row is conserved
+  // before cooling, so streaks neither vanish nor explode — they wander.
+  uint16_t acc[NUM_LEDS];
+  memset(acc, 0, sizeof(acc));
+  for (int l = 0; l < NUM_LEDS; l++) {
+    if (fh[l] == 0) continue;
+    int r = pixel[l].row;
+    float x = pixel[l].x;
+
+    int ul = -1, ur = -1;
+    for (int n = 0; n < NUM_LEDS; n++) {
+      if (pixel[n].row != r + 1) continue;
+      float dx = pixel[n].x - x;
+      if (dx > -0.75f && dx < -0.25f) ul = n;
+      else if (dx > 0.25f && dx < 0.75f) ur = n;
+    }
+
+    int p = random(101);
+    if (ul >= 0) acc[ul] += (uint16_t)fh[l] * p / 100;
+    if (ur >= 0) acc[ur] += (uint16_t)fh[l] * (100 - p) / 100;
+  }
+
   uint8_t nh[NUM_LEDS];
   for (int l = 0; l < NUM_LEDS; l++) {
-    int r = pixel[l].row;
-    if (r <= 1) {
-      nh[l] = fh[l];
-      continue;
-    }
-
-    float lx = pixel[l].x + (random(5) - 2) * 0.6f;
-
-    uint8_t best_heat = 0;
-    float   best_dx   = 99.0f;
-    for (int n = 0; n < NUM_LEDS; n++) {
-      if (pixel[n].row == r - 1) {
-        float dx = fabsf(lx - pixel[n].x);
-        if (dx < best_dx) {
-          best_dx   = dx;
-          best_heat = fh[n];
-        }
-      }
-    }
-
-    // Range 6–60: wide variance — lucky streaks climb much higher, unlucky ones die fast
-    int v = (int)best_heat - random(FIRE_COOL_MIN, FIRE_COOL_MAX);
-    nh[l] = v < 0 ? 0 : (uint8_t)v;
+    if (pixel[l].row <= 1) { nh[l] = fh[l]; continue; }
+    int v = (int)acc[l] - random(FIRE_COOL_MIN, FIRE_COOL_MAX);
+    if (v < 0) v = 0;
+    if (v > 255) v = 255;
+    nh[l] = (uint8_t)v;
   }
   memcpy(fh, nh, NUM_LEDS);
   }
