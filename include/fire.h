@@ -2,11 +2,17 @@
 #include "pattern.h"
 #include "pixel.h"
 
+static const uint8_t FIRE_STEPS    = 60; 
+static const uint8_t FIRE_SPAWN    = 25;  // % chance to seed an ember in bottom rows
+static const uint8_t FIRE_COOL_MIN = 5;   // cooling as heat rises
+static const uint8_t FIRE_COOL_MAX = 61;  
+static const uint8_t FIRE_BOT_COOL = 14; 
+static const uint8_t FIRE_HUE_MAX  = 20; 
+
 static uint8_t fh[NUM_LEDS];       // current sim state (target)
 static uint8_t fh_prev[NUM_LEDS];  // previous sim state (interp from)
 static uint8_t fire_rdy = 0;
 static uint8_t fire_tick = 0;
-static const uint8_t FIRE_STEPS = 6;  // frames between sim steps
 
 void fire() {
   if (!fire_rdy) {
@@ -22,10 +28,10 @@ void fire() {
   // Seed bottom 2 rows sparsely — ~35% of pixels lit to create distinct streaks
   for (int l = 0; l < NUM_LEDS; l++) {
     if (pixel[l].row <= 1) {
-      if (random(100) < 35)
+      if (random(100) < FIRE_SPAWN)
         fh[l] = 170 + random(86);
       else
-        fh[l] = fh[l] > 8 ? fh[l] - 8 : 0;  // let unlit pixels cool
+        fh[l] = fh[l] > FIRE_BOT_COOL ? fh[l] - FIRE_BOT_COOL : 0;  // let unlit pixels cool
     }
   }
 
@@ -56,7 +62,7 @@ void fire() {
     }
 
     // Range 6–60: wide variance — lucky streaks climb much higher, unlucky ones die fast
-    int v = (int)best_heat - 6 - random(55);
+    int v = (int)best_heat - random(FIRE_COOL_MIN, FIRE_COOL_MAX);
     nh[l] = v < 0 ? 0 : (uint8_t)v;
   }
   memcpy(fh, nh, NUM_LEDS);
@@ -74,7 +80,7 @@ void fire() {
     } else if (h < 170) {
       hv = map(h, 85, 169, 0, 20); sat = 255; val = 255;
     } else {
-      hv  = map(h, 170, 255, 20, 30);  // orange → yellow-orange (no green)
+      hv  = map(h, 170, 255, 18, FIRE_HUE_MAX);  // orange → yellow-orange (no green)
       sat = 255;
       val = 255;
     }
