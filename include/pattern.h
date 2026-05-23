@@ -4,7 +4,7 @@
 #include "pixel.h"
 #include "lib.h"
 
-String mode = "secrings";
+String mode = "circle";
 
 #define HUE_DIFF 10
 unsigned short bright = 50;
@@ -131,30 +131,37 @@ void cross(){
 }
 
 
-  float ratio = 0.33;
-  float off = 0;
-  
+
 void circle(){
+  static float ratio = 0.33;
+  static float breathPhase = 0;
   int lim = 6;
-  int val;
+  float breatheAmp = 1.5;
+  float baseRadius = 3.5;
+  float breathe = baseRadius + breatheAmp * sin(breathPhase * 2 * PI);
+
   for(int l=0;l<NUM_LEDS;l++){
     float r = sqrt( pixel[l].x*pixel[l].x + pixel[l].y*pixel[l].y );
-    if(r>5) val = 255;
-    else val = 0;
 
-    float col = cos(ratio * PI) * pixel[l].y - pixel[l].x * sin(ratio *PI) + off * lim ;
+    float outerEdge = 6.5;
+    float brightness;
+    if(!invert)
+      brightness = constrain((r - breathe) / (outerEdge - breathe), 0.0, 1.0);
+    else
+      brightness = constrain((breathe - r) / breathe, 0.0, 1.0);
+    int val = int(brightness * 255);
+
+    float col = cos(ratio * PI) * pixel[l].y - pixel[l].x * sin(ratio * PI);
     if(col<-lim)col=-lim; else if(col>lim)col=lim;
 
     int h = int(linear(col, -lim,lim, hue, hue+20 ));
-    // p(l);p(" , ");p(c); p(" , "); pl(val);
 
-    leds[l].setHSV( h ,250,  val );
+    leds[l].setHSV( h, 250, val );
   }
   FastLED.show();
 
   ratio += 0.1;
-  // if(ratio>1.0) ratio = 0;
-  // pl(ratio);
+  breathPhase += 1.0 / 60.0;
   delay(100);
 }
 
@@ -415,8 +422,8 @@ void scroll_lines_tick() {
     if (sl_width < SL_MIN_WIDTH) sl_width = SL_MIN_WIDTH;
     sl_n--;
   } else if (random(10) == 0) {
-    sl_n     = random(30, 80);
-    sl_ang_v = (random(2) ? 1.0f : -1.0f) * random(20, 60) * 0.0001f;
+    sl_n     = random(120, 240);
+    sl_ang_v = (random(2) ? 1.0f : -1.0f) * random(10, 30) * 0.0001f;
     sl_wid_v = (random(2) ? 1.0f : -1.0f) * random(20, 60) * 0.0001f;
   }
 }
@@ -450,7 +457,7 @@ void scroll_lines(){
   }
   FastLED.show();
 
-  f += 0.01;
+  f += 0.015;
   delay(20);
 }
 
