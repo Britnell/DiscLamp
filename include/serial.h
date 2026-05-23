@@ -7,6 +7,7 @@
 #include "pixel.h"
 
 void snake_reshuffle();
+void rain_reshuffle();
 
 extern uint8_t h, m, s;
 
@@ -19,6 +20,7 @@ void cmd_line(String str){
     if(cmd=='m'){
         mode = str;
         if(str.equals("snake")) snake_reshuffle();
+        if(str.equals("rain"))  rain_reshuffle();
         p(" mode = ");
         pl(str);
         return;
