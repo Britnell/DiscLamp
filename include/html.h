@@ -44,6 +44,12 @@ const char * html = R"rawliteral(
             this.mode = sel.value;
             this.send('m', sel.value);
           },
+          prev() {
+            const sel = this.$refs.mode;
+            sel.selectedIndex = (sel.selectedIndex - 1 + sel.options.length) % sel.options.length;
+            this.mode = sel.value;
+            this.send('m', sel.value);
+          },
           cmd(ev) {
             const v = ev.target.elements.cip.value;
             this.send(v[0], v.slice(1));
@@ -62,6 +68,7 @@ const char * html = R"rawliteral(
             <option :value="m" x-text="m"></option>
           </template>
         </select>
+        <button @click="prev()">Prev</button>
         <button @click="next()">Next</button>
       </div>
       <div>
