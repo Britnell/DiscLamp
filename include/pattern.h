@@ -12,6 +12,7 @@ unsigned short hue = 1;
 unsigned short hue_a = hue + HUE_DIFF;
 unsigned short hue_b = (hue + 256 - HUE_DIFF) % 256;
 short invert = 0;
+uint8_t param = 50;
 float f = 0;
 long timer = 0;
 

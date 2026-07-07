@@ -1,3 +1,3 @@
 
-#define STASSID "Radnage"
-#define STAPSK  "Qu1ckBr0wn"
+#define STASSID "Internet Box"
+#define STAPSK  "BeHereNow!000"

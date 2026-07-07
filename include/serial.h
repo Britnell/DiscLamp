@@ -7,7 +7,8 @@
 #include "pixel.h"
 
 void snake_reshuffle();
-void rain_reshuffle();
+void rain_randomize();
+void init_autom();
 
 extern uint8_t h, m, s;
 
@@ -17,10 +18,15 @@ String serial_in = "";
 void cmd_line(String str){
     char cmd = str.charAt(0);
     str.remove(0,1);
+    if(cmd=='p'){
+        param = (uint8_t)str.toInt();
+        return;
+    }
     if(cmd=='m'){
         mode = str;
         if(str.equals("snake")) snake_reshuffle();
-        if(str.equals("rain"))  rain_reshuffle();
+        if(str.equals("rain"))  rain_randomize();
+        if(str.equals("autom")) init_autom();
         p(" mode = ");
         pl(str);
         return;

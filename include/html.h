@@ -72,14 +72,18 @@ const char * html = R"rawliteral(
         <label>Color </label>
         <input id="h" name="h" type="range" min="0" max="255" value="0" step="5" />
       </div>
-      <div x-show="mode === 'snake'">
-        <button @click="send('m', 'snake')">Shuffle</button>
+      <div x-show="mode === 'snake' || mode === 'autom'">
+        <button @click="send('m', mode)">Shuffle</button>
       </div>
-      <div x-show="mode !== 'snake'">
+      <div x-show="mode !== 'snake' && mode !== 'autom'">
         <label>
           <input name="i" type="checkbox" />
           Invert
         </label>
+      </div>
+      <div x-show="mode === 'rain'">
+        <label>Param </label>
+        <input id="p" name="p" type="range" min="0" max="100" value="50" step="1" />
       </div>
       <div>
         <form @submit.prevent="cmd($event)">

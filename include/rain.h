@@ -14,7 +14,6 @@ float rain_speed = 0.04;
 
 uint8_t num_rain = 10;
 float   rain_rad = 1.0f;
-uint8_t rain_initialised = 0;
 
 typedef struct {
   float x;
@@ -23,21 +22,23 @@ typedef struct {
 
 RAIN_PARTICLE particles[RAIN_MAX_COUNT];
 
-void rain_reshuffle(){
+void rain_restart(){
   // scale 0..100: 0 = few big particles, 100 = many small particles
-  uint8_t scale = 50; //random(0, 101);
-  num_rain = (uint8_t)linear(scale, 0, 100, RAIN_MIN_COUNT, RAIN_MAX_COUNT);
-  rain_rad = linear(scale, 0, 100, RAIN_MAX_RAD, RAIN_MIN_RAD);
+  num_rain = (uint8_t)linear(param, 0, 100, RAIN_MIN_COUNT, RAIN_MAX_COUNT);
+  rain_rad = linear(param, 0, 100, RAIN_MAX_RAD, RAIN_MIN_RAD);
 
   for(int r=0; r<num_rain; r++){
     particles[r].x = linear(random(0,255), 0, 255, -6, 6);
     particles[r].y = linear(r, 0, num_rain+1, -6, 6);
   }
-  rain_initialised = 1;
+}
+
+void rain_randomize(){
+  param = random(0, 101);
+  rain_restart();
 }
 
 void rain(){
-  if(!rain_initialised) rain_reshuffle();
   int val;
   float x, d, dist;
 

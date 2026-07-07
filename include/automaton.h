@@ -63,6 +63,7 @@ void init_autom(){
 }
 
 
+
 void find_neighbours(LED_STRUCT pix, int nbrs[6] ){
   // L & R
   if(pix.l>0){

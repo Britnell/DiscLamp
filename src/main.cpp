@@ -24,6 +24,7 @@ void setup() {
 
   init_pixel();
   snake_reshuffle();
+  rain_randomize();
   demo();
   Serial.println(" ready");
 }
