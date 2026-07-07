@@ -40,8 +40,9 @@ void cmd_line(String str){
     }    
     if(cmd=='h'){
         hue = str.toInt();
-        hue_a = hue + HUE_DIFF;
-        hue_b = (hue + 256 - HUE_DIFF) % 256;
+        uint8_t diff = hue_diff(hue);
+        hue_a = (hue + diff) % 256;
+        hue_b = (hue + 256 - diff) % 256;
         p(" hue = ");
         pl(hue);
         return;

@@ -16,6 +16,14 @@ float linear(float x, float xmin, float xmax, float omin, float omax ){
 }
 
 
+// Hue difference scaling: smaller near reds (0/255), larger in blues (~128)
+uint8_t hue_diff(uint8_t h) {
+    if (h < 128)
+        return (uint8_t)linear(h, 0, 128, 10, 26);
+    else
+        return (uint8_t)linear(h, 128, 255, 26, 10);
+}
+
 int e = 0;
 
 int every(int num){
