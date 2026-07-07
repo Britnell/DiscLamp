@@ -32,6 +32,12 @@ void setup() {
 void loop() {
   read_serial();
   grad_tick();
+  if(mode != "clock" && mode != "binaryclock" && mode != "secrings") {
+    if(millis() - timer >= 1000){
+      timer = millis();
+      tick();
+    }
+  }
   
   if(mode.equals("full"))   full();
   else if(mode.equals("half"))    half();

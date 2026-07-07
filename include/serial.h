@@ -8,6 +8,7 @@
 
 void snake_reshuffle();
 void rain_randomize();
+void rain_restart();
 void init_autom();
 
 extern uint8_t h, m, s;
@@ -20,6 +21,7 @@ void cmd_line(String str){
     str.remove(0,1);
     if(cmd=='p'){
         param = (uint8_t)str.toInt();
+        rain_restart();
         return;
     }
     if(cmd=='m'){
