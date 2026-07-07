@@ -15,29 +15,34 @@ void binaryclock_2()
     leds[l] = CRGB(0, 0, 0);
   }
   // CENTRE <>
-  uint8_t wh = 140;
-  leds[74].setHSV(0, 128, wh);
-  leds[76].setHSV(0, 128, wh);
-  leds[87].setHSV(0, 128, wh);
-  leds[88].setHSV(0, 128, wh);
-  leds[62].setHSV(0, 128, wh);
-  leds[63].setHSV(0, 128, wh);
-  leds[50].setHSV(0, 128, wh);
-  leds[100].setHSV(0, 128, wh);
+  // uint8_t wh = 140;
+  // leds[74].setHSV(0, 128, wh);
+  // leds[76].setHSV(0, 128, wh);
+  // leds[87].setHSV(0, 128, wh);
+  // leds[88].setHSV(0, 128, wh);
+  // leds[62].setHSV(0, 128, wh);
+  // leds[63].setHSV(0, 128, wh);
+  // leds[50].setHSV(0, 128, wh);
+  // leds[100].setHSV(0, 128, wh);
 
   for (b = 0; b < 6; b++)
   {
     val = (s & (0x01 << b)) ? 255 : 0;
+    leds[26 + b].setHSV(hue_b, 250, val);
+    leds[26 - b].setHSV(hue_b, 250, val);
+    leds[124 + b].setHSV(hue_b, 250, val);
+    leds[124 - b].setHSV(hue_b, 250, val);
+
+    
+    val = (m & (0x01 << b )) ? 255 : 0;
     leds[38 + b].setHSV(hue_a, 250, val);
     leds[37 - b].setHSV(hue_a, 250, val);
     leds[113 + b].setHSV(hue_a, 250, val);
     leds[112 - b].setHSV(hue_a, 250, val);
-
-    // val = (m & (0x01 << b )) ? 255 : 0;
-    leds[50 + 1 + b].setHSV(hue_b, 250, val);
-    leds[50 - 1 - b].setHSV(hue_b, 250, val);
-    leds[100 + 1 + b].setHSV(hue_b, 250, val);
-    leds[100 - 1 - b].setHSV(hue_b, 250, val);
+    leds[50 + 1 + b].setHSV(hue_a, 250, val);
+    leds[50 - 1 - b].setHSV(hue_a, 250, val);
+    leds[100 + 1 + b].setHSV(hue_a, 250, val);
+    leds[100 - 1 - b].setHSV(hue_a, 250, val);
 
     if (b < 4)
     {
