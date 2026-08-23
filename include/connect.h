@@ -107,7 +107,7 @@ void wifi_loop(){
     server.handleClient();
     static unsigned long last_time_send = 0;
     unsigned long now_ms = millis();
-    if(now_ms - last_time_send >= 10000){
+    if(now_ms - last_time_send >= 1000){
         last_time_send = now_ms;
         send_time();
     }

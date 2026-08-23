@@ -59,6 +59,7 @@ void cmd_line(String str){
         int th, tm, ts;
         if(sscanf(str.c_str(), "%d:%d:%d", &th, &tm, &ts) == 3){
             h = th; m = tm; s = ts;
+            timer = 0;
         }
         return;
     }
