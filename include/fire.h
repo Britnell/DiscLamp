@@ -14,16 +14,8 @@ static uint8_t fh_prev[NUM_LEDS];  // previous sim state (interp from)
 static uint8_t fire_rdy = 0;
 static uint8_t fire_tick = 0;
 
-void fire() {
-  if (!fire_rdy) {
-    memset(fh, 0, NUM_LEDS);
-    memset(fh_prev, 0, NUM_LEDS);
-    fire_rdy = 1;
-  }
-
-  if (++fire_tick >= FIRE_STEPS) {
-    fire_tick = 0;
-    memcpy(fh_prev, fh, NUM_LEDS);
+void fire_sim_step() {
+  memcpy(fh_prev, fh, NUM_LEDS);
 
   // Seed bottom 2 rows sparsely — ~35% of pixels lit to create distinct streaks
   for (int l = 0; l < NUM_LEDS; l++) {
@@ -68,6 +60,22 @@ void fire() {
     nh[l] = (uint8_t)v;
   }
   memcpy(fh, nh, NUM_LEDS);
+}
+
+void fire() {
+  if (!fire_rdy) {
+    memset(fh, 0, NUM_LEDS);
+    memset(fh_prev, 0, NUM_LEDS);
+    fire_rdy = 1;
+
+    // pre-run the sim so fire doesn't start blank
+    for (int i = 0; i < 6; i++)
+        fire_sim_step();
+  }
+
+  if (++fire_tick >= FIRE_STEPS) {
+    fire_tick = 0;
+    fire_sim_step();
   }
 
   // Interpolate between previous and current sim state for smooth fading
