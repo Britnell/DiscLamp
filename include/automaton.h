@@ -143,13 +143,12 @@ void automaton(){
   fade_t++;
   if(bright_t < 255) bright_t++;
   CRGB col_a; col_a.setHSV(hue,   250, 255);
-  // CRGB col_b; col_b.setHSV(128, 250, 255);
   CRGB col_b; col_b.setHSV((uint8_t)hue_a, 250, 255);
   CRGB target = blend(col_a, col_b, triwave8(fade_t));
   for(int l=0;l<NUM_LEDS;l++){
-    if(aut_state[l] && aut_prev[l])  { leds[l] = target; leds[l].nscale8(triwave8(fade_t)); }
+    if(aut_state[l] && aut_prev[l])  { leds[l] = target; }
     else if(aut_state[l])            { leds[l] = target; leds[l].nscale8(bright_t); }
-    else                               leds[l].nscale8(230);
+    else                               leds[l].nscale8(246);
   }
   FastLED.show();  
   delay(10);
