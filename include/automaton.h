@@ -129,6 +129,11 @@ void init_autom(){
 
   // pre-run a couple of gens so it doesn't start as a tiny blob
   for(int i=0;i<3;i++) autom_step();
+
+  // fresh fade-in from black, and don't let a stale `timer`
+  // (shared with other patterns) tick the first gen instantly
+  memcpy(aut_prev, aut_state, NUM_LEDS);
+  timer = millis();
 }
 
 void automaton(){
