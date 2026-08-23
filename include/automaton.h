@@ -142,18 +142,26 @@ void automaton(){
     aut_initialised = 1;
   }
 
-  // Paint
-  static uint8_t fade_t = 0;   // free-running, drives color A→B
-  static uint8_t bright_t = 0; // resets each gen, drives fade-in brightness
-  fade_t++;
-  if(bright_t < 255) bright_t++;
-  CRGB col_a; col_a.setHSV(hue,   250, 255);
-  CRGB col_b; col_b.setHSV((uint8_t)hue_a, 250, 255);
-  CRGB target = blend(col_a, col_b, triwave8(fade_t));
+  // Paint — fade progress derived from time, not frame count
+  // first half of FADE_MS: OFF->colB, second half: colB->colA
+  #define FADE_MS 2000 // keep <= gen length (2000) so fades finish before the next state change
+  uint16_t elapsed = millis() - timer; // timer reset each gen, so this is gen age
+  if(elapsed > FADE_MS) elapsed = FADE_MS;
+  CRGB col_a; col_a.setHSV(hue, 250, 255);        // the one colour everything settles on
+  CRGB col_b; col_b.setHSV((uint8_t)hue_a, 250, 255); // flash colour, only for newly-on pixels
   for(int l=0;l<NUM_LEDS;l++){
-    if(aut_state[l] && aut_prev[l])  { leds[l] = target; }
-    else if(aut_state[l])            { leds[l] = target; leds[l].nscale8(bright_t); }
-    else                               leds[l].nscale8(246);
+    if(aut_state[l] && aut_prev[l])  { leds[l] = col_a; }
+    else if(aut_state[l]) {
+      if(elapsed < FADE_MS/2){
+        // step 1: fade up in colB
+        leds[l] = col_b;
+        leds[l].nscale8( (uint32_t)elapsed * 510UL / FADE_MS );
+      } else {
+        // step 2: cross-fade colB -> colA
+        leds[l] = blend(col_b, col_a, (uint32_t)(elapsed - FADE_MS/2) * 510UL / FADE_MS );
+      }
+    }
+    else leds[l].nscale8(246);
   }
   FastLED.show();  
   delay(10);
@@ -162,7 +170,6 @@ void automaton(){
   if(millis()-timer > 2000){
     timer = millis();
     memcpy(aut_prev, aut_state, NUM_LEDS);
-    bright_t = 0;
     int count = autom_step();
     autom_check(count);
 
