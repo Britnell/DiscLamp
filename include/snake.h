@@ -112,6 +112,8 @@ void snake_step(SNAKE &s) {
 }
 
 
+void snake_warmup(uint8_t steps);
+
 // --- reshuffle: called every time the mode is selected ---
 
 void snake_reshuffle() {
@@ -121,6 +123,8 @@ void snake_reshuffle() {
         snake_init(snakes[s], (uint8_t)(s * NUM_LEDS / num_snakes));
     p("snake reshuffle: n="); p(num_snakes);
     p(" mirror="); pl(snake_mirror);
+
+    snake_warmup(6);
 }
 
 
@@ -134,6 +138,13 @@ void snake_render(SNAKE &s, uint8_t h) {
     if(s.dropped_tail) snake_paint(s.old_tail, h, fade_out);
     snake_paint(s.next_head, h, fade_in);
     for(int i=0; i<s.len; i++) snake_paint(s.body[i], h, 255);
+}
+
+// pre-run the snakes a few steps so they don't start as single dots
+void snake_warmup(uint8_t steps) {
+    for(int i=0; i<steps; i++)
+        for(int s=0; s<num_snakes; s++)
+            snake_step(snakes[s]);
 }
 
 void snake_loop() {

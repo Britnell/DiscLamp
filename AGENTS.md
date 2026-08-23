@@ -1,0 +1,4 @@
+- we are running some animations on neopixel ws2812 leds.
+- the strips are parallel in a matrix like pattern, however each 2nd row staggered for a hexagonal / honeycomb style grid
+- main animation loop `./src/main.cpp`
+- different patterns and lib in `./include/`
