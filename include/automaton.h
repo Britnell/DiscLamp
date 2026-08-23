@@ -55,15 +55,6 @@ void autom_start(){
   aut_state[88] = 1;
 }
 
-void init_autom(){
-  autom_eras = 0;
-  safe_rules();
-
-  autom_start();
-}
-
-
-
 void find_neighbours(LED_STRUCT pix, int nbrs[6] ){
   // L & R
   if(pix.l>0){
@@ -101,7 +92,7 @@ void autom_check(int total){
     random_rules();
 }
 
-void update_autom(){
+int autom_step(){
   uint8_t next [NUM_LEDS];
 
   for(int l=0;l<NUM_LEDS;l++){
@@ -127,8 +118,17 @@ void update_autom(){
     aut_state[l] = next[l];
     total += next[l];
   }
-  
-  autom_check(total);
+  return total;
+}
+
+void init_autom(){
+  autom_eras = 0;
+  safe_rules();
+
+  autom_start();
+
+  // pre-run a couple of gens so it doesn't start as a tiny blob
+  for(int i=0;i<3;i++) autom_step();
 }
 
 void automaton(){
@@ -143,6 +143,7 @@ void automaton(){
   fade_t++;
   if(bright_t < 255) bright_t++;
   CRGB col_a; col_a.setHSV(hue,   250, 255);
+  // CRGB col_b; col_b.setHSV(128, 250, 255);
   CRGB col_b; col_b.setHSV((uint8_t)hue_a, 250, 255);
   CRGB target = blend(col_a, col_b, triwave8(fade_t));
   for(int l=0;l<NUM_LEDS;l++){
@@ -158,9 +159,10 @@ void automaton(){
     timer = millis();
     memcpy(aut_prev, aut_state, NUM_LEDS);
     bright_t = 0;
-    update_autom();
+    int count = autom_step();
+    autom_check(count);
 
-    if(autom_eras++ ==10){
+    if(autom_eras++ == 10){
       random_rules();
       autom_eras=0;
     }
