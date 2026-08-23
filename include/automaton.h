@@ -143,23 +143,17 @@ void automaton(){
   }
 
   // Paint
-  static uint8_t bright_t = 0; // resets each gen, drives newborn fade-in
+  static uint8_t fade_t = 0;   // free-running, drives color A→B
+  static uint8_t bright_t = 0; // resets each gen, drives fade-in brightness
+  fade_t++;
   if(bright_t < 255) bright_t++;
-  CRGB col_a; col_a.setHSV((uint8_t)hue_a, 250, 255);  // birth colour (orange)
-  CRGB col_h; col_h.setHSV(hue,       250, 255);      // main hue
+  CRGB col_a; col_a.setHSV(hue,   250, 255);
+  CRGB col_b; col_b.setHSV((uint8_t)hue_a, 250, 255);
+  CRGB target = blend(col_a, col_b, triwave8(fade_t));
   for(int l=0;l<NUM_LEDS;l++){
-    if(aut_state[l] && !aut_prev[l]){
-      // newly turned on: fade from off to hue_a
-      leds[l] = col_a;
-      leds[l].nscale8(bright_t);
-    }
-    else if(aut_state[l]){
-      // staying on: main hue
-      leds[l] = col_h;
-    }
-    else {
-      leds[l].nscale8(246);
-    }
+    if(aut_state[l] && aut_prev[l])  { leds[l] = target; }
+    else if(aut_state[l])            { leds[l] = target; leds[l].nscale8(bright_t); }
+    else                               leds[l].nscale8(246);
   }
   FastLED.show();  
   delay(10);
