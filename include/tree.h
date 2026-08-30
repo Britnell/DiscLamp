@@ -21,7 +21,8 @@ typedef struct {
     uint8_t  dir;        // direction of last committed growth step
     int      next;       // pixel fading in (-1 = none / dead end)
     uint8_t  next_dir;   // direction tip -> next
-    uint8_t  frame;      // counts 0..move_frames while next fades in
+    int16_t  frame;      // counts up to move_frames while next fades in;
+                         // starts negative to stagger parallel growers
     bool     active;     // false = idle slot / tree complete
 } TREE_GROWER;
 
@@ -129,6 +130,21 @@ int tree_branch_start(uint8_t idx, uint8_t &ndir, uint8_t gi) {
     return -1;
 }
 
+// restart delay for grower gi: pick the countdown so this grower's commits
+// land halfway between the other grower's commits - the branches then fade
+// their pixels in alternately. computed from the other grower's current
+// position in its cycle, so it works no matter when the restart happens.
+// falls back to an even spread by index when no other grower is running
+int16_t tree_restart_delay(uint8_t gi) {
+    for(uint8_t i=0; i<TREE_GROWERS; i++) {
+        if(i == gi || !tree.g[i].active || tree.g[i].next < 0) continue;
+        int16_t d = (int16_t)((TREE_MOVE_FRAMES/2 - tree.g[i].frame) % TREE_MOVE_FRAMES);
+        if(d < 0) d += TREE_MOVE_FRAMES;
+        return d;
+    }
+    return (int16_t)((int)gi * TREE_MOVE_FRAMES / TREE_GROWERS);
+}
+
 // respawn grower gi on a random tree cell, then scan linearly (wrapping)
 // for one that can still grow a branch; false if the tree is complete
 bool tree_start_new_branch(uint8_t gi) {
@@ -143,7 +159,7 @@ bool tree_start_new_branch(uint8_t gi) {
             g->dir      = ndir;
             g->next     = c;
             g->next_dir = ndir;
-            g->frame    = 0;
+            g->frame    = -tree_restart_delay(gi);
             g->active   = true;
             return true;
         }
@@ -227,7 +243,7 @@ void tree_render() {
     }
     for(uint8_t i=0; i<TREE_GROWERS; i++) {
         TREE_GROWER *g = &tree.g[i];
-        if(!g->active || g->next < 0) continue;
+        if(!g->active || g->next < 0 || g->frame <= 0) continue;
         uint8_t fade = (uint8_t)(255UL * g->frame / tree_move_frames());
         LED_STRUCT q = pixel[g->next];
         leds[g->next].setHSV( grad_hue(q.x, q.y), 250, fade );
