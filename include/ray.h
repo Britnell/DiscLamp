@@ -8,12 +8,10 @@
 #include "orbit.h"
 
 // ------------------------- tunables -------------------------
-// half-width of each line: 255 on the line, falling off quadratically
-// to 0 at this distance. keep >= DY (0.87), otherwise the line goes
-// dark when the centre drifts between two rows
-#define RAY_W 0.75f
+// width = distance we dim pixels, falling off quadratically
+#define RAY_W 1.0f
 // orbit steps per frame - higher = faster drifting centre
-#define RAY_SPEED 3
+#define RAY_SPEED 2
 // frame delay in ms
 #define RAY_DELAY 60
 // where the centre starts
