@@ -3,11 +3,12 @@
 #include "pattern.h"
 #include "pixel.h"
 
-#define TREE_STEM_MOVE_FRAMES 6     // frames per stem growth step (delay(20) -> ~0.12 s)
-#define TREE_MOVE_FRAMES  40    // frames per branch growth step (delay(20) -> ~1 s)
-#define TREE_PAUSE_FRAMES 150   // hold finished tree 5 s before regrowing
+#define TREE_STEM_MOVE_FRAMES 10  // frames per stem growth step (delay(20) -> ~0.12 s)
+#define TREE_MOVE_FRAMES  35      // frames per branch growth step (delay(20) -> ~1 s)
+#define TREE_PAUSE_FRAMES 40      // hold finished tree 5 s before regrowing
 
 #define TREE_GROWERS 2           // branches growing simultaneously - raise for more
+#define TREE_STEMS     2         // stems leaving the base in opposite directions
 
 // directions (subset of snake's): 0=left 1=right 2=up-R 3=up-L 4=dn-R 5=dn-L
 
@@ -182,6 +183,14 @@ uint8_t tree_base() {
     return (uint8_t)find_pixel(0.0f, 0.0f);
 }
 
+// start a growth in one fixed direction (for the paired stems); falls back
+// to any valid direction only if the preferred one is blocked (tiny disc)
+int tree_stem_start(uint8_t idx, uint8_t dir, uint8_t gi, uint8_t &ndir) {
+    int c = tree_next_field(idx, dir);
+    if(tree_branch_valid(c, idx, gi)) { ndir = dir; return c; }
+    return tree_branch_start(idx, ndir, gi);
+}
+
 void tree_init() {
     tree.len   = 1;
     tree.pos[0]= tree_base();
@@ -189,17 +198,28 @@ void tree_init() {
     tree.pause = 0;
     for(uint8_t i=0; i<TREE_GROWERS; i++) tree.g[i].active = false;
 
-    // grower 0 is the stem, started like any other growth
-    TREE_GROWER *g = &tree.g[0];
-    g->tip      = tree.pos[0];
-    g->frame    = 0;
-    g->active   = true;
-    g->next     = tree_branch_start(g->tip, g->next_dir, 0);
-    g->dir      = g->next_dir;
-    if(g->next < 0) {
-        g->active = false;
-        tree.pause = TREE_PAUSE_FRAMES;
+    // two stems leaving the base in opposite directions:
+    // L v R, UL v DR or UR v DL; random swap so either grower may take
+    // either side. from here on they grow randomly and independently.
+    static const uint8_t pairs[3][2] = { {0,1}, {3,4}, {2,5} };
+    uint8_t p    = random(3);
+    uint8_t flip = random(2);
+
+    for(uint8_t i=0; i<TREE_STEMS; i++) {
+        TREE_GROWER *g = &tree.g[i];
+        g->tip      = tree.pos[0];
+        g->dir      = pairs[p][i ^ flip];
+        g->next     = tree_stem_start(g->tip, g->dir, i, g->next_dir);
+        g->dir      = g->next_dir;
+        // stagger: stems commit halfway out of phase, fading in alternately
+        g->frame    = (int16_t)(-(int)i * TREE_STEM_MOVE_FRAMES / TREE_STEMS);
+        g->active   = (g->next >= 0);
     }
+
+    // disc too small to grow any stem -> hold and retry
+    bool any = false;
+    for(uint8_t i=0; i<TREE_STEMS; i++) any |= tree.g[i].active;
+    if(!any) tree.pause = TREE_PAUSE_FRAMES;
 }
 
 void tree_reshuffle() {
@@ -224,9 +244,14 @@ void tree_grower_step(uint8_t gi) {
     g->next = tree_pick_branch(g->tip, g->dir, g->next_dir, gi);
     if(g->next < 0) {
         if(tree.mode == TREE_STEM) {
-            tree.mode = TREE_BRANCH;
-            g->active = false;
-            tree_spawn_growers();
+            g->active = false;           // this stem is finished
+            // branch out only once every stem has dead-ended
+            bool any = false;
+            for(uint8_t i=0; i<TREE_STEMS; i++) any |= tree.g[i].active;
+            if(!any) {
+                tree.mode = TREE_BRANCH;
+                tree_spawn_growers();
+            }
         }
         else if(!tree_start_new_branch(gi))
             g->active = false;           // this grower is done for good
