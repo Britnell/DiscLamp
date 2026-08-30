@@ -144,7 +144,7 @@ void automaton(){
 
   // Paint — fade progress derived from time, not frame count
   // first half of FADE_MS: OFF->colB, second half: colB->colA
-  #define FADE_MS 2000 // keep <= gen length (2000) so fades finish before the next state change
+  #define FADE_MS 4000 // keep <= gen length (4000) so fades finish before the next state change
   uint16_t elapsed = millis() - timer; // timer reset each gen, so this is gen age
   if(elapsed > FADE_MS) elapsed = FADE_MS;
   CRGB col_a; col_a.setHSV(hue, 250, 255);        // the one colour everything settles on
@@ -167,7 +167,7 @@ void automaton(){
   delay(10);
 
   // automaton state
-  if(millis()-timer > 2000){
+  if(millis()-timer > 4000){
     timer = millis();
     memcpy(aut_prev, aut_state, NUM_LEDS);
     int count = autom_step();
