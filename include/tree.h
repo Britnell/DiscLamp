@@ -10,7 +10,6 @@
 #define TREE_GROWERS 2           // branches growing simultaneously - raise for more
 
 // directions (subset of snake's): 0=left 1=right 2=up-R 3=up-L 4=dn-R 5=dn-L
-// stem never grows down (0-3 only), branches may grow in any direction
 
 #define TREE_STEM    0
 #define TREE_BRANCH  1
@@ -37,23 +36,7 @@ typedef struct {
 TREE tree;
 
 
-// --- turn rule: every step must turn +/-60 deg, never straight ---
-// after L  -> UL          (DL forbidden, stem goes up)
-// after R  -> UR          (DR forbidden)
-// after UL -> UR or L
-// after UR -> UL or R
-uint8_t tree_options(uint8_t dir, uint8_t out[2]) {
-    uint8_t n = 0;
-    switch(dir) {
-        case 0: out[n++] = 3;             break;
-        case 1: out[n++] = 2;             break;
-        case 2: out[n++] = 3; out[n++] = 1; break;
-        case 3: out[n++] = 2; out[n++] = 0; break;
-    }
-    return n;
-}
-
-// branch turn rule: same +/-60 deg turns, but any direction incl. down
+// turn rule: every step must turn +/-60 deg, never straight
 // cycle L -> UL -> UR -> R -> DR -> DL -> L, take its two neighbours
 uint8_t tree_branch_options(uint8_t dir, uint8_t out[2]) {
     switch(dir) {
@@ -83,28 +66,9 @@ int tree_next_field(uint8_t idx, uint8_t dir) {
     return -1;
 }
 
-// pick a random existing option; also reports which direction was taken
-int tree_pick_next(uint8_t idx, uint8_t dir, uint8_t &ndir) {
-    uint8_t opts[2];
-    uint8_t n = tree_options(dir, opts);
 
-    int     cand[2];
-    uint8_t cdir[2];
-    uint8_t nc = 0;
-    for(uint8_t i=0; i<n; i++) {
-        int c = tree_next_field(idx, opts[i]);
-        if(c >= 0) { cand[nc] = c; cdir[nc] = opts[i]; nc++; }
-    }
-    if(nc == 0) return -1;          // dead end: stem is finished
-
-    uint8_t pick = random(nc);
-    ndir = cdir[pick];
-    return cand[pick];
-}
-
-
-// --- branch growth ---
-// a new branch cell must not touch the existing tree, except for the cell
+// --- growth rules ---
+// a new cell must not touch the existing tree, except for the cell
 // it grows out of - keeps branches one empty field apart.
 // other growers' pending cells count as tree, so parallel tips never
 // collide or grow into each other
@@ -132,7 +96,7 @@ bool tree_branch_valid(int c, uint8_t from, uint8_t gi) {
     return true;
 }
 
-// continue a branch: turn +/-60 deg from the last direction, if valid
+// continue growing: turn +/-60 deg from the last direction, if valid
 int tree_pick_branch(uint8_t idx, uint8_t dir, uint8_t &ndir, uint8_t gi) {
     uint8_t opts[2];
     tree_branch_options(dir, opts);
@@ -144,14 +108,14 @@ int tree_pick_branch(uint8_t idx, uint8_t dir, uint8_t &ndir, uint8_t gi) {
         int c = tree_next_field(idx, opts[i]);
         if(tree_branch_valid(c, idx, gi)) { cand[nc] = c; cdir[nc] = opts[i]; nc++; }
     }
-    if(nc == 0) return -1;          // dead end: branch is finished
+    if(nc == 0) return -1;          // dead end: this tip is finished
 
     uint8_t pick = random(nc);
     ndir = cdir[pick];
     return cand[pick];
 }
 
-// first step of a new branch: try all 6 directions in random order
+// first step of a new growth (stem or branch): try all 6 directions in random order
 int tree_branch_start(uint8_t idx, uint8_t &ndir, uint8_t gi) {
     uint8_t order[6] = {0,1,2,3,4,5};
     for(uint8_t i=5; i>0; i--) {
@@ -197,35 +161,25 @@ void tree_spawn_growers() {
 
 // --- state machine ---
 
-// base led: random pick of the two middle leds of the bottom row (x = +/-0.5)
-uint8_t tree_random_base() {
-    int a = find_pixel( 0.5f, pixel[0].y);
-    int b = find_pixel(-0.5f, pixel[0].y);
-    if(a < 0) return (uint8_t)b;
-    if(b < 0) return (uint8_t)a;
-    return random(2) ? (uint8_t)a : (uint8_t)b;
+// base led: the centre led of the disc
+uint8_t tree_base() {
+    return (uint8_t)find_pixel(0.0f, 0.0f);
 }
 
 void tree_init() {
     tree.len   = 1;
-    tree.pos[0]= tree_random_base();
+    tree.pos[0]= tree_base();
     tree.mode  = TREE_STEM;
     tree.pause = 0;
     for(uint8_t i=0; i<TREE_GROWERS; i++) tree.g[i].active = false;
 
-    // grower 0 is the stem; first step is up-diagonal only
-    // (no sideways step off the base)
+    // grower 0 is the stem, started like any other growth
     TREE_GROWER *g = &tree.g[0];
-    g->tip    = tree.pos[0];
-    g->frame  = 0;
-    g->active = true;
-    int a = tree_next_field(tree.pos[0], 2);   // UR
-    int b = tree_next_field(tree.pos[0], 3);   // UL
-    if      (a < 0) { g->next = b; g->next_dir = 3; }
-    else if (b < 0) { g->next = a; g->next_dir = 2; }
-    else if (random(2)) { g->next = a; g->next_dir = 2; }
-    else            { g->next = b; g->next_dir = 3; }
-    g->dir = g->next_dir;
+    g->tip      = tree.pos[0];
+    g->frame    = 0;
+    g->active   = true;
+    g->next     = tree_branch_start(g->tip, g->next_dir, 0);
+    g->dir      = g->next_dir;
     if(g->next < 0) {
         g->active = false;
         tree.pause = TREE_PAUSE_FRAMES;
@@ -240,8 +194,9 @@ uint8_t tree_move_frames() {
     return (tree.mode == TREE_STEM) ? TREE_STEM_MOVE_FRAMES : TREE_MOVE_FRAMES;
 }
 
-// commit one grower's pending cell, then pick its next target; a grower
-// that dead-ends respawns, and the stem handover fires up all branch growers
+// commit one grower's pending cell, then pick its next target; stem and
+// branches share the same pick, a stem that dead-ends (hits the outside)
+// fires up all branch growers, a branch respawns elsewhere
 void tree_grower_step(uint8_t gi) {
     TREE_GROWER *g = &tree.g[gi];
 
@@ -250,18 +205,14 @@ void tree_grower_step(uint8_t gi) {
     g->dir   = g->next_dir;
     g->frame = 0;
 
-    if(tree.mode == TREE_STEM) {
-        g->next = tree_pick_next(g->tip, g->dir, g->next_dir);
-        if(g->next < 0) {
-            // stem reached the top -> branch mode, all growers spawn
+    g->next = tree_pick_branch(g->tip, g->dir, g->next_dir, gi);
+    if(g->next < 0) {
+        if(tree.mode == TREE_STEM) {
             tree.mode = TREE_BRANCH;
             g->active = false;
             tree_spawn_growers();
         }
-    }
-    else {
-        g->next = tree_pick_branch(g->tip, g->dir, g->next_dir, gi);
-        if(g->next < 0 && !tree_start_new_branch(gi))
+        else if(!tree_start_new_branch(gi))
             g->active = false;           // this grower is done for good
     }
 }
