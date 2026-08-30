@@ -4,7 +4,7 @@
 #include "pixel.h"
 #include "lib.h"
 
-String mode = "autom";
+String mode = "grid";
 
 #define HUE_DIFF 10
 unsigned short bright = 50;
@@ -93,10 +93,10 @@ void triangle(){
   int val;
   float L, R;
   for(int l=0;l<NUM_LEDS;l++){
-    L = pixel[l].y + 1.6 * pixel[l].x + 7 ;
-    R = pixel[l].y - 1.6 * pixel[l].x + 7 ;
-    
-    if( L>0 && R>0 && pixel[l].y < 4 )       
+    L = pixel[l].y + 1.6 * pixel[l].x + 6.13 ;
+    R = pixel[l].y - 1.6 * pixel[l].x + 6.13 ;
+
+    if( L>0 && R>0 && pixel[l].y < 3.13 )       
       val = 255;
     else            val = 0;
     
