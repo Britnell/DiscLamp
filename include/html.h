@@ -27,7 +27,7 @@ const char * html = R"rawliteral(
   <script>
       document.addEventListener('alpine:init', () => {
         Alpine.data('lamp', () => ({
-          modes: ['full','half','square','triangle','grid','circle','lines','scroll_lines','waves','zig','rain','hues','autom','clock','snake','moon','fire','binaryclock','secrings','ray'],
+          modes: ['full','half','square','triangle','grid','circle','lines','scroll_lines','waves','zig','rain','hues','autom','clock','snake','tree','moon','fire','binaryclock','secrings','ray'],
           mode: 'full',
           send(name, val) {
             fetch(`/set?${name}=${val}`).then(r => r.text()).then(console.log);
@@ -79,10 +79,10 @@ const char * html = R"rawliteral(
         <label>Color </label>
         <input id="h" name="h" type="range" min="0" max="255" value="0" step="5" />
       </div>
-      <div x-show="mode === 'snake' || mode === 'autom'">
+      <div x-show="mode === 'snake' || mode === 'autom' || mode === 'tree'">
         <button @click="send('m', mode)">Shuffle</button>
       </div>
-      <div x-show="mode !== 'snake' && mode !== 'autom'">
+      <div x-show="mode !== 'snake' && mode !== 'autom' && mode !== 'tree'>
         <label>
           <input name="i" type="checkbox" />
           Invert

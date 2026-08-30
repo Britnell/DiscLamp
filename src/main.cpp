@@ -11,6 +11,7 @@
 #include "clock.h"
 #include "binaryclock.h"
 #include "snake.h"
+#include "tree.h"
 // #include "fast.h"
 #include "moon.h"
 #include "fire.h"
@@ -26,6 +27,7 @@ void setup() {
 
   init_pixel();
   snake_reshuffle();
+  tree_reshuffle();
   rain_randomize();
   demo();
   Serial.println(" ready");
@@ -59,6 +61,7 @@ void loop() {
   else if(mode.equals("clock"))   clock_loop();
   else if(mode.equals("binaryclock"))   binaryclock_loop();
   else if(mode.equals("snake"))   snake_loop();
+  else if(mode.equals("tree"))    tree_loop();
   else if(mode.equals("moon"))    moon();
   else if(mode.equals("fire"))    fire();
   else if(mode.equals("digit"))   digit_loop();

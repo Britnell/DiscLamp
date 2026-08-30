@@ -7,6 +7,7 @@
 #include "pixel.h"
 
 void snake_reshuffle();
+void tree_reshuffle();
 void rain_randomize();
 void rain_restart();
 void init_autom();
@@ -27,6 +28,7 @@ void cmd_line(String str){
     if(cmd=='m'){
         mode = str;
         if(str.equals("snake")) snake_reshuffle();
+        if(str.equals("tree"))  tree_reshuffle();
         if(str.equals("rain"))  rain_randomize();
         if(str.equals("autom")) init_autom();
         p(" mode = ");
