@@ -5,3 +5,4 @@
 - different patterns and lib in `./include/*.h`
 - controlling lamp via a web interface running on local wifi `http://lamp.local` 
 - wifi server is running on separate controller `./src/server.cpp` which controls animation controller via Serial commands
+- to understand the led grid geometrics see `./src/include/pixel.h` where the array of led pixel struct is generated

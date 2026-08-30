@@ -91,3 +91,4 @@ Updates once per second. Reads cleanly once you know the encoding but is more de
 - **Ring ripples** — multiple concentric rings expanding outward from a tap/trigger, like water ripples
 - **Twinkle** — random LEDs flicker independently at different rates
 - **Binary counter** — counts upward in binary across all LEDs, as a data-art pattern
+- snake - make each snake have its own symmetry and snakes come and go. maybe when they leave the circle a new snake is added.
