@@ -73,6 +73,7 @@ void wifi_setup(){
   Serial.println("SEtUP==");
 
   WiFi.mode(WIFI_STA);
+  WiFi.setHostname("lamp");
   WiFi.begin(ssid, password);
 
   while (WiFi.waitForConnectResult() != WL_CONNECTED) {
@@ -82,7 +83,11 @@ void wifi_setup(){
 
   print_ip();
 
-  MDNS.begin("lamp");
+  if (MDNS.begin("lamp")) {
+    Serial.println("mDNS OK -> http://lamp.local");
+  } else {
+    Serial.println("mDNS failed!");
+  }
 
   configTime("CET-1CEST,M3.5.0,M10.5.0/3", "pool.ntp.org", "time.nist.gov");
   // wait up to 5s for NTP sync
