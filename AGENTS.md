@@ -1,4 +1,7 @@
 - we are running some animations on neopixel ws2812 leds.
 - the strips are parallel in a matrix like pattern, however each 2nd row staggered for a hexagonal / honeycomb style grid
 - main animation loop `./src/main.cpp`
-- different patterns and lib in `./include/`
+- patterns controlled throu `./include/pattern.h`
+- different patterns and lib in `./include/*.h`
+- controlling lamp via a web interface running on local wifi `http://lamp.local` 
+- wifi server is running on separate controller `./src/server.cpp` which controls animation controller via Serial commands
