@@ -39,13 +39,13 @@ uint8_t tree_options(uint8_t dir, uint8_t out[2]) {
 }
 
 // neighbour lookup, no wrapping: -1 if there is no led there
+// NB: L/R must be resolved via x, not index - the strips run in alternating
+// directions per row, so idx+1 is only "right" on every second row!
 int tree_next_field(uint8_t idx, uint8_t dir) {
     LED_STRUCT pix = pixel[idx];
     switch(dir) {
-        case 0: if(idx > 0          && pixel[idx-1].row == pix.row) return idx-1;
-                break;
-        case 1: if(idx < NUM_LEDS-1 && pixel[idx+1].row == pix.row) return idx+1;
-                break;
+        case 0: return find_pixel(pix.x-1.0f, pix.y);
+        case 1: return find_pixel(pix.x+1.0f, pix.y);
         case 2: return find_pixel(pix.x+0.5f, pix.y+DY);
         case 3: return find_pixel(pix.x-0.5f, pix.y+DY);
     }
@@ -92,10 +92,19 @@ void tree_set_next() {
 void tree_init() {
     tree.len   = 1;
     tree.pos[0]= tree_random_base();
-    tree.dir   = random(2) ? 2 : 3;       // first growth step is up-diagonal only
     tree.frame = 0;
     tree.pause = 0;
-    tree_set_next();
+
+    // first growth step is up-diagonal only (no sideways step off the base)
+    int a = tree_next_field(tree.pos[0], 2);   // UR
+    int b = tree_next_field(tree.pos[0], 3);   // UL
+    if      (a < 0) { tree.next = b; tree.next_dir = 3; }
+    else if (b < 0) { tree.next = a; tree.next_dir = 2; }
+    else if (random(2)) { tree.next = a; tree.next_dir = 2; }
+    else            { tree.next = b; tree.next_dir = 3; }
+    tree.dir = tree.next_dir;
+    if(tree.next < 0)
+        tree.pause = TREE_PAUSE_FRAMES;
 }
 
 void tree_reshuffle() {
