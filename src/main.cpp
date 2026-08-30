@@ -18,6 +18,7 @@
 #include "ring.h"
 #include "secrings.h"
 #include "grid.h"
+#include "ray.h"
 
 void setup() {
 
@@ -63,6 +64,7 @@ void loop() {
   else if(mode.equals("digit"))   digit_loop();
   else if(mode.equals("secrings"))  secrings_loop();
   else if(mode.equals("grid"))   grid();
+  else if(mode.equals("ray"))    ray();
 
   // else if(mode.equals("cross"))   cross();
   // else if(mode.equals("count"))    //   count();
