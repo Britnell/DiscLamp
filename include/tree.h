@@ -3,7 +3,8 @@
 #include "pattern.h"
 #include "pixel.h"
 
-#define TREE_MOVE_FRAMES  40    // frames per growth step (delay(20) -> ~1 s)
+#define TREE_STEM_MOVE_FRAMES 5  // frames per stem growth step (delay(20) -> ~0.12 s)
+#define TREE_MOVE_FRAMES  40    // frames per branch growth step (delay(20) -> ~1 s)
 #define TREE_PAUSE_FRAMES 150   // hold finished tree 5 s before regrowing
 
 // directions (subset of snake's): 0=left 1=right 2=up-R 3=up-L 4=dn-R 5=dn-L
@@ -225,13 +226,17 @@ void tree_step() {
 
 // --- render ---
 
+uint8_t tree_move_frames() {
+    return (tree.mode == TREE_STEM) ? TREE_STEM_MOVE_FRAMES : TREE_MOVE_FRAMES;
+}
+
 void tree_render() {
     for(uint16_t i=0; i<tree.len; i++) {
         LED_STRUCT q = pixel[tree.pos[i]];
         leds[tree.pos[i]].setHSV( grad_hue(q.x, q.y), 250, 255 );
     }
     if(tree.next >= 0) {
-        uint8_t fade = (uint8_t)(255UL * tree.frame / TREE_MOVE_FRAMES);
+        uint8_t fade = (uint8_t)(255UL * tree.frame / tree_move_frames());
         LED_STRUCT q = pixel[tree.next];
         leds[tree.next].setHSV( grad_hue(q.x, q.y), 250, fade );
     }
@@ -246,7 +251,7 @@ void tree_loop() {
     }
     else {
         tree.frame++;
-        if(tree.frame >= TREE_MOVE_FRAMES && tree.next >= 0) tree_step();
+        if(tree.frame >= tree_move_frames() && tree.next >= 0) tree_step();
     }
 
     tree_render();
