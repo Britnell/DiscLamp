@@ -4,7 +4,7 @@
 #include "pixel.h"
 #include "lib.h"
 
-String mode = "secrings";
+String mode = "grid";
 
 #define HUE_DIFF 10
 unsigned short bright = 20;
@@ -203,9 +203,7 @@ void waves(){
   }
   FastLED.show();  
 
-  if(every(5)){
-    f += 0.1;
-  }
+  f += 0.02;
   
   delay(20);
 } 
