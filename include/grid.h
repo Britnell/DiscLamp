@@ -10,8 +10,8 @@
 #define GRID_SPACING_Y 3      // rows
 #define GRID_HOLD_MS   2000   // hold time before moving
 #define GRID_FADE_MS   2000   // crossfade duration
-#define GRID_STEP_HX   1      // x drift per step (doubled coords: 1 = slight right)
-#define GRID_STEP_HY   -1     // y drift per step (rows down)
+#define GRID_STEP_HX   1      // diagonal unit per s: fade spans s..s+2 = (2,2) total, passing through (1,1)
+#define GRID_STEP_HY   -1
 #define GRID_Y_SKEW     1      // x offset per y-band: hex rows have no straight-down pixel, odd band-counts shift 1 over
 
 static uint32_t grid_t0 = 0;
@@ -49,7 +49,7 @@ void grid(){
     if(now - grid_t0 >= GRID_FADE_MS){
       grid_phase = 0;
       grid_t0 = now;
-      grid_step++;
+      grid_step += 2;
     }
   }
 
@@ -57,12 +57,15 @@ void grid(){
   if(fade > 1.0) fade = 1.0;
 
   for(int l=0;l<NUM_LEDS;l++){
-    uint8_t onA = grid_dot(pixel[l].hx, pixel[l].hy, grid_step);
-    uint8_t onB = grid_dot(pixel[l].hx, pixel[l].hy, grid_step + 1);
+    int v0 = grid_dot(pixel[l].hx, pixel[l].hy, grid_step    ) ? 255 : 0;  // origin
+    int v1 = grid_dot(pixel[l].hx, pixel[l].hy, grid_step + 1) ? 255 : 0;  // midpoint (1,1)
+    int v2 = grid_dot(pixel[l].hx, pixel[l].hy, grid_step + 2) ? 255 : 0;  // target (2,2)
 
-    int vA = onA ? 255 : 0;
-    int vB = onB ? 255 : 0;
-    int val = vA + (int)(fade * (vB - vA));
+    // origin fades out while target fades in
+    int val = v0 + (int)(fade * (v2 - v0));
+    // inbetween pulses up to half and back off (never fully on)
+    val += (int)(v1 * 0.5f * sinf(fade * PI));
+    if(val > 255) val = 255;
 
     if(invert) val = 255 - val;
 
