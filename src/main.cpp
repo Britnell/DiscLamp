@@ -21,6 +21,17 @@
 #include "grid.h"
 #include "ray.h"
 
+// All available patterns (documentation only, not compiled):
+#if 0
+const char *PATTERN_LIST[] = {
+  "full", "half", "square", "triangle", "circle",
+  "lines", "scroll_lines", "waves", "zig",
+  "rain", "hues", "autom", "clock", "binaryclock",
+  "snake", "tree", "moon", "fire", "digit",
+  "secrings", "grid", "ray"
+};
+#endif
+
 void setup() {
 
   Serial.begin(115200);
