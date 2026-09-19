@@ -15,6 +15,7 @@
 #define MIRROR_X    1   // flip horizontally (x -> -x)
 #define MIRROR_Y    2   // flip vertically   (y -> -y)
 #define MIRROR_XY   3   // flip both axes    (x -> -x, y -> -y)
+#define MIRROR_ALL  4   // quad: draw at all of X, Y and XY mirrors (4 dots)
 uint8_t snake_mirror = MIRROR_X;
 uint8_t num_snakes   = 2;
 
@@ -31,21 +32,57 @@ typedef struct {
 
 SNAKE snakes[SNAKE_MAX_COUNT];
 
+uint16_t snake_loop_count = 0; // 20ms per loop -> ~1500 loops = 30s
+#define SNAKE_MIRROR_LOOPS 500 //1500
+
 
 // --- mirror helpers ---
 
-int snake_mirror_of(uint8_t idx) {
-    if(snake_mirror == MIRROR_NONE) return -1;
-    LED_STRUCT p = pixel[idx];
-    float mx = (snake_mirror == MIRROR_X || snake_mirror == MIRROR_XY) ? -p.x : p.x;
-    float my = (snake_mirror == MIRROR_Y || snake_mirror == MIRROR_XY) ? -p.y : p.y;
-    return find_pixel(mx, my);
-}
-
 void snake_paint(uint8_t idx, uint8_t h, uint8_t v) {
-    leds[idx].setHSV(h, 250, v);
-    int m = snake_mirror_of(idx);
-    if(m >= 0 && m != idx) leds[m].setHSV(h, 250, v);
+    LED_STRUCT p = pixel[idx];
+    int m;
+
+    switch(snake_mirror) {
+        case MIRROR_NONE: // no mirror, just the snake itself
+            leds[idx].setHSV(h, 250, v);
+            break;
+
+        case MIRROR_X: { // flip horizontally (x -> -x)
+            leds[idx].setHSV(h, 250, v);
+            m = find_pixel(-p.x, p.y);
+            if(m >= 0 && m != idx) leds[m].setHSV(h, 250, v);
+            break;
+        }
+
+        case MIRROR_Y: { // flip vertically (y -> -y)
+            leds[idx].setHSV(h, 250, v);
+            m = find_pixel(p.x, -p.y);
+            if(m >= 0 && m != idx) leds[m].setHSV(h, 250, v);
+            break;
+        }
+
+        case MIRROR_XY: { // flip both axes (x -> -x, y -> -y)
+            leds[idx].setHSV(h, 250, v);
+            m = find_pixel(-p.x, -p.y);
+            if(m >= 0 && m != idx) leds[m].setHSV(h, 250, v);
+            break;
+        }
+
+        case MIRROR_ALL: { // quad: draw at all of X, Y and XY mirrors (4 dots)
+            int m[3] = {
+                find_pixel(-p.x,  p.y),
+                find_pixel( p.x, -p.y),
+                find_pixel(-p.x, -p.y)
+            };
+            // for(int i=0; i<3; i++) if(m[i] >= 0 && m[i] != idx) 
+            leds[idx].setHSV(h, 250, v);
+            leds[m[0]].setHSV(h, 250, v);
+            leds[m[1]].setHSV(h, 250, v);
+            leds[m[2]].setHSV(h, 250, v);
+            leds[m[3]].setHSV(h, 250, v);
+            break;
+        }
+    }
 }
 
 // --- next-field lookup with edge wrapping ---
@@ -118,7 +155,7 @@ void snake_warmup(uint8_t steps);
 
 void snake_reshuffle() {
     num_snakes   = (uint8_t)(random(2, SNAKE_MAX_COUNT+1));
-    snake_mirror = random(1,4);
+    snake_mirror = random(1,5);
     for(int s = 0; s < num_snakes; s++)
         snake_init(snakes[s], (uint8_t)(s * NUM_LEDS / num_snakes));
     p("snake reshuffle: n="); p(num_snakes);
@@ -148,6 +185,11 @@ void snake_warmup(uint8_t steps) {
 }
 
 void snake_loop() {
+    if(++snake_loop_count >= SNAKE_MIRROR_LOOPS) {
+        snake_loop_count = 0;
+        snake_reshuffle(); // picks a new symmetry (always mirrored) and rescatters snakes
+    }
+
     for(int l=0; l<NUM_LEDS; l++) leds[l] = CRGB::Black;
 
     for(int s=0; s<num_snakes; s++) {
