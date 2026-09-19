@@ -7,7 +7,7 @@
 String mode = "secrings";
 
 #define HUE_DIFF 10
-unsigned short bright = 50;
+unsigned short bright = 20;
 unsigned short hue = 1;
 unsigned short hue_a = hue + HUE_DIFF;
 unsigned short hue_b = (hue + 256 - HUE_DIFF) % 256;
