@@ -6,20 +6,28 @@
 #include "pixel.h"
 
 // * * * params * * *
-#define GRID_SPACING_X 8      // hx is doubled coords: 8 = every 4th visible led
-#define GRID_SPACING_Y 4      // 4 rows
+#define GRID_SPACING_X 6      // hx is doubled coords (in-row step=2): 8 = every 4th visible led
+#define GRID_SPACING_Y 3      // rows
 #define GRID_HOLD_MS   2000   // hold time before moving
 #define GRID_FADE_MS   2000   // crossfade duration
-#define GRID_STEP_HX   1      // hex move: 1 row down = hx +1, hy -1 (diagonal down-right in staggered grid)
-#define GRID_STEP_HY   -1
+#define GRID_STEP_HX   1      // x drift per step (doubled coords: 1 = slight right)
+#define GRID_STEP_HY   -1     // y drift per step (rows down)
+#define GRID_Y_SKEW     1      // x offset per y-band: hex rows have no straight-down pixel, odd band-counts shift 1 over
 
 static uint32_t grid_t0 = 0;
 static uint8_t  grid_phase = 0;     // 0 = hold, 1 = fade
 static uint16_t grid_step = 0;
 
+static int grid_floordiv(int a, int b){
+  int q = a / b;
+  if((a % b != 0) && ((a < 0) != (b < 0))) q--;
+  return q;
+}
+
 static uint8_t grid_dot(int hx, int hy, uint16_t s){
   int x = hx - GRID_STEP_HX * (int)s;
   int y = hy - GRID_STEP_HY * (int)s;
+  x -= grid_floordiv(y, GRID_SPACING_Y) * GRID_Y_SKEW;   // skew x by band index
   int m;
   if(x>=0) m = x % GRID_SPACING_X; else m = (GRID_SPACING_X - ((-x) % GRID_SPACING_X)) % GRID_SPACING_X;
   if(m) return 0;
@@ -27,7 +35,7 @@ static uint8_t grid_dot(int hx, int hy, uint16_t s){
   return m==0;
 }
 
-// moving 4x4 grid: hold 6s, then 1.6s crossfade to position one row diagonally down/right
+// moving grid: hold, then crossfade to next skewed position, repeat
 
 void grid(){
 
@@ -49,8 +57,6 @@ void grid(){
   if(fade > 1.0) fade = 1.0;
 
   for(int l=0;l<NUM_LEDS;l++){
-    int gx = (int)round(pixel[l].x);
-
     uint8_t onA = grid_dot(pixel[l].hx, pixel[l].hy, grid_step);
     uint8_t onB = grid_dot(pixel[l].hx, pixel[l].hy, grid_step + 1);
 
