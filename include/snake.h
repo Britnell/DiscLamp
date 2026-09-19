@@ -16,7 +16,9 @@
 #define MIRROR_Y    2   // flip vertically   (y -> -y)
 #define MIRROR_XY   3   // flip both axes    (x -> -x, y -> -y)
 #define MIRROR_ALL  4   // quad: draw at all of X, Y and XY mirrors (4 dots)
+#define MIRROR_ROT  5   // 4-fold rotational: 180deg copy (x,y)->(-x,-y) plus 90/270 rotations
 uint8_t snake_mirror = MIRROR_X;
+uint8_t snake_prev_mirror = MIRROR_NONE;
 uint8_t num_snakes   = 2;
 
 typedef struct {
@@ -74,12 +76,22 @@ void snake_paint(uint8_t idx, uint8_t h, uint8_t v) {
                 find_pixel( p.x, -p.y),
                 find_pixel(-p.x, -p.y)
             };
-            // for(int i=0; i<3; i++) if(m[i] >= 0 && m[i] != idx) 
             leds[idx].setHSV(h, 250, v);
             leds[m[0]].setHSV(h, 250, v);
             leds[m[1]].setHSV(h, 250, v);
             leds[m[2]].setHSV(h, 250, v);
-            leds[m[3]].setHSV(h, 250, v);
+            break;
+        }
+
+        case MIRROR_ROT: { // 4-fold rotational symmetry: (x,y), (-x,-y), (y,-x), (-y,x)
+            int m[3] = {
+                find_pixel(-p.x, -p.y), // 180 deg
+                find_pixel( p.y, -p.x), // 90 deg
+                find_pixel(-p.y,  p.x)  // 270 deg
+            };
+            leds[idx].setHSV(h, 250, v);
+            for(int i=0; i<3; i++)
+                if(m[i] >= 0 && m[i] != idx) leds[m[i]].setHSV(h, 250, v);
             break;
         }
     }
@@ -155,7 +167,10 @@ void snake_warmup(uint8_t steps);
 
 void snake_reshuffle() {
     num_snakes   = (uint8_t)(random(2, SNAKE_MAX_COUNT+1));
-    snake_mirror = random(1,5);
+    uint8_t m;
+    do { m = (uint8_t)random(1,6); } while(m == snake_mirror || m == snake_prev_mirror);
+    snake_prev_mirror = snake_mirror;
+    snake_mirror = m;
     for(int s = 0; s < num_snakes; s++)
         snake_init(snakes[s], (uint8_t)(s * NUM_LEDS / num_snakes));
     p("snake reshuffle: n="); p(num_snakes);
