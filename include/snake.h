@@ -35,7 +35,7 @@ typedef struct {
 SNAKE snakes[SNAKE_MAX_COUNT];
 
 uint16_t snake_loop_count = 0; // 20ms per loop -> ~1500 loops = 30s
-#define SNAKE_MIRROR_LOOPS 500 //1500
+#define SNAKE_MIRROR_LOOPS 1000 
 
 
 // --- mirror helpers ---

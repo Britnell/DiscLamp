@@ -1,6 +1,7 @@
 #ifndef SECRINGS_H
 #define SECRINGS_H
 
+#include "pixel.h"
 #include "pattern.h"
 #include "clock.h"
 #include "ring.h"
@@ -15,6 +16,14 @@ void secrings_loop() {
       if (s & (0x01 << b))
         draw_ring(b+1);
     }
+    uint8_t l = 4;
+    leds[l].setHSV(grad_hue(pixel[l].x, pixel[l].y), 250, 255);
+    l=10;
+    leds[l].setHSV(grad_hue(pixel[l].x, pixel[l].y), 250, 255);
+    l=140;
+    leds[l].setHSV(grad_hue(pixel[l].x, pixel[l].y), 250, 255);
+    l=146;
+    leds[l].setHSV(grad_hue(pixel[l].x, pixel[l].y), 250, 255);
     FastLED.show();
   }
 }
