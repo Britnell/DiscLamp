@@ -4,7 +4,7 @@
 #include "pixel.h"
 #include "lib.h"
 
-String mode = "grid";
+String mode = "tree";
 
 #define HUE_DIFF 10
 unsigned short bright = 20;

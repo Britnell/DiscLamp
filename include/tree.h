@@ -3,12 +3,12 @@
 #include "pattern.h"
 #include "pixel.h"
 
-#define TREE_STEM_MOVE_FRAMES 10  // frames per stem growth step (delay(20) -> ~0.12 s)
+#define TREE_STEM_FRAMES  12       // frames per stem growth step (delay(20) -> ~0.12 s)
 #define TREE_MOVE_FRAMES  35      // frames per branch growth step (delay(20) -> ~1 s)
-#define TREE_PAUSE_FRAMES 40      // hold finished tree 5 s before regrowing
+#define TREE_PAUSE_FRAMES 10      // hold finished tree 5 s before regrowing
 
-#define TREE_GROWERS 2           // branches growing simultaneously - raise for more
-#define TREE_STEMS     2         // stems leaving the base in opposite directions
+#define TREE_STEMS    2     // stems leaving the base in opposite directions
+#define TREE_BRANCHES 2     // branches growing simultaneously - raise for more
 
 // directions (subset of snake's): 0=left 1=right 2=up-R 3=up-L 4=dn-R 5=dn-L
 
@@ -32,7 +32,7 @@ typedef struct {
     uint16_t len;
     uint8_t  mode;           // TREE_STEM or TREE_BRANCH
     uint16_t pause;          // frames left holding the finished tree
-    TREE_GROWER g[TREE_GROWERS];
+    TREE_GROWER g[TREE_BRANCHES];
 } TREE;
 
 TREE tree;
@@ -90,7 +90,7 @@ bool tree_branch_valid(int c, uint8_t from, uint8_t gi) {
         if(tree.pos[i] == from)           continue;      // allowed parent
         if(tree_adjacent(tree.pos[i], c)) return false;  // touches tree
     }
-    for(uint8_t i=0; i<TREE_GROWERS; i++) {
+    for(uint8_t i=0; i<TREE_BRANCHES; i++) {
         if(i == gi || !tree.g[i].active || tree.g[i].next < 0) continue;
         if(tree.g[i].next == c)              return false;  // other tip's target
         if(tree_adjacent(tree.g[i].next, c)) return false;  // keep distance
@@ -137,13 +137,13 @@ int tree_branch_start(uint8_t idx, uint8_t &ndir, uint8_t gi) {
 // position in its cycle, so it works no matter when the restart happens.
 // falls back to an even spread by index when no other grower is running
 int16_t tree_restart_delay(uint8_t gi) {
-    for(uint8_t i=0; i<TREE_GROWERS; i++) {
+    for(uint8_t i=0; i<TREE_BRANCHES; i++) {
         if(i == gi || !tree.g[i].active || tree.g[i].next < 0) continue;
         int16_t d = (int16_t)((TREE_MOVE_FRAMES/2 - tree.g[i].frame) % TREE_MOVE_FRAMES);
         if(d < 0) d += TREE_MOVE_FRAMES;
         return d;
     }
-    return (int16_t)((int)gi * TREE_MOVE_FRAMES / TREE_GROWERS);
+    return (int16_t)((int)gi * TREE_MOVE_FRAMES / TREE_BRANCHES);
 }
 
 // respawn grower gi on a random tree cell, then scan linearly (wrapping)
@@ -170,7 +170,7 @@ bool tree_start_new_branch(uint8_t gi) {
 
 // activate a grower in every idle slot (when branch mode begins)
 void tree_spawn_growers() {
-    for(uint8_t i=0; i<TREE_GROWERS; i++)
+    for(uint8_t i=0; i<TREE_BRANCHES; i++)
         if(!tree.g[i].active)
             tree_start_new_branch(i);
 }
@@ -196,7 +196,7 @@ void tree_init() {
     tree.pos[0]= tree_base();
     tree.mode  = TREE_STEM;
     tree.pause = 0;
-    for(uint8_t i=0; i<TREE_GROWERS; i++) tree.g[i].active = false;
+    for(uint8_t i=0; i<TREE_BRANCHES; i++) tree.g[i].active = false;
 
     // two stems leaving the base in opposite directions:
     // L v R, UL v DR or UR v DL; random swap so either grower may take
@@ -212,7 +212,7 @@ void tree_init() {
         g->next     = tree_stem_start(g->tip, g->dir, i, g->next_dir);
         g->dir      = g->next_dir;
         // stagger: stems commit halfway out of phase, fading in alternately
-        g->frame    = (int16_t)(-(int)i * TREE_STEM_MOVE_FRAMES / TREE_STEMS);
+        g->frame    = (int16_t)(-(int)i * TREE_STEM_FRAMES / TREE_STEMS);
         g->active   = (g->next >= 0);
     }
 
@@ -227,7 +227,7 @@ void tree_reshuffle() {
 }
 
 uint8_t tree_move_frames() {
-    return (tree.mode == TREE_STEM) ? TREE_STEM_MOVE_FRAMES : TREE_MOVE_FRAMES;
+    return (tree.mode == TREE_STEM) ? TREE_STEM_FRAMES : TREE_MOVE_FRAMES;
 }
 
 // commit one grower's pending cell, then pick its next target; stem and
@@ -266,7 +266,7 @@ void tree_render() {
         LED_STRUCT q = pixel[tree.pos[i]];
         leds[tree.pos[i]].setHSV( grad_hue(q.x, q.y), 250, 255 );
     }
-    for(uint8_t i=0; i<TREE_GROWERS; i++) {
+    for(uint8_t i=0; i<TREE_BRANCHES; i++) {
         TREE_GROWER *g = &tree.g[i];
         if(!g->active || g->next < 0 || g->frame <= 0) continue;
         uint8_t fade = (uint8_t)(255UL * g->frame / tree_move_frames());
@@ -284,7 +284,7 @@ void tree_loop() {
     }
     else {
         uint8_t mf = tree_move_frames();
-        for(uint8_t i=0; i<TREE_GROWERS; i++) {
+        for(uint8_t i=0; i<TREE_BRANCHES; i++) {
             TREE_GROWER *g = &tree.g[i];
             if(!g->active) continue;
             g->frame++;
@@ -294,7 +294,7 @@ void tree_loop() {
         // tree complete when no branch can grow anywhere anymore
         if(tree.mode == TREE_BRANCH) {
             bool any = false;
-            for(uint8_t i=0; i<TREE_GROWERS; i++) any |= tree.g[i].active;
+            for(uint8_t i=0; i<TREE_BRANCHES; i++) any |= tree.g[i].active;
             if(!any) tree.pause = TREE_PAUSE_FRAMES;
         }
     }
