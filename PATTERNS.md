@@ -71,6 +71,23 @@ Two snakes wander the hex grid simultaneously, each with its own hue (`hue` and 
 
 ---
 
+### `zap`
+Laser show through haze. Up to 4 soft 2–3 px beams shoot across the dark disc with a hot white head, mostly along the 3 hex axes. Each leaves a full line that holds, then fades or is erased by its own tail. Crossings flare white and spark; some beams strobe on ignition, and an afterglow buffer leaves cooling ghosts. `param` = beam density, `invert` = dark beams on a lit disc.
+
+### `ripple`
+Raindrops on a pond. Drops land at random spots with a small splash, then send out a bright ring followed by a fainter one, dimming as they spread. Rings from several drops interfere (crests flare, crest+trough cancel) and bounce faintly off the rim, over a dim shimmering water base. Occasionally a big drop sends slower, stronger rings. `param` = rain rate, `invert` = dark crests on a lit pond.
+
+### `vortex`
+A slowly rotating spiral galaxy. 2–3 soft Archimedean arms wind out of a whitish core, breathing between a tight coil and loose spokes over ~40 s; spin drifts and occasionally reverses, and it crossfades between 2 and 3 arms every minute or two. Hue runs `hue` (centre) → `hue_a` (rim). `param` = spin speed, `invert` = dark arms on a lit disc.
+
+### `sand`
+A sealed glass of layered coloured sand (~35–62% fill, set by `param`) on the hex grid. Grains fall, slide and heap against the rim; every 15–30 s the lamp "tilts" (gravity turns 60°, sometimes flips 180°) and the pile avalanches into a new heap, layers folding into each other. Moving grains glow and glide between cells; at rest the heap is still with a faint twinkle. `invert` = dark specks in a lit field.
+
+### `firefly`
+~26 fireflies blink at random, then learn to flash in step: pulse-coupled oscillators whose coupling radius and strength ramp up over ~25 s, so local clusters and travelling waves form before the whole disc pulses as one warm-white breath. After holding ~14 s a blackout scatters phases, relocates a few fireflies and the cycle restarts. `param` = sync speed, `invert` = dark flashes on a lit field.
+
+---
+
 ### `clock`
 A binary clock. The seconds, minutes, and hours are each encoded as binary bits, with each bit shown as a symmetric pair of LEDs mirrored around a centre point on different horizontal rows:
 - Seconds: 6 bits around row centre (LED 75)

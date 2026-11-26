@@ -20,6 +20,11 @@
 #include "secrings.h"
 #include "grid.h"
 #include "ray.h"
+#include "zap.h"
+#include "ripple.h"
+#include "vortex.h"
+#include "sand.h"
+#include "firefly.h"
 
 // All available patterns (documentation only, not compiled):
 #if 0
@@ -28,7 +33,7 @@ const char *PATTERN_LIST[] = {
   "lines", "scroll_lines", "waves", "zig",
   "rain", "hues", "autom", "clock", "binaryclock",
   "snake", "tree", "moon", "fire", "digit",
-  "secrings", "grid", "ray"
+  "secrings", "grid", "ray", "zap", "ripple", "vortex", "sand", "firefly"
 };
 #endif
 
@@ -79,6 +84,11 @@ void loop() {
   else if(mode.equals("secrings"))  secrings_loop();
   else if(mode.equals("grid"))   grid();
   else if(mode.equals("ray"))    ray();
+  else if(mode.equals("zap"))    zap();
+  else if(mode.equals("ripple"))   ripple();
+  else if(mode.equals("vortex"))   vortex();
+  else if(mode.equals("sand"))   sand();
+  else if(mode.equals("firefly"))   firefly();
 
   // else if(mode.equals("cross"))   cross();
   // else if(mode.equals("count"))    //   count();

@@ -27,7 +27,7 @@ const char * html = R"rawliteral(
   <script>
       document.addEventListener('alpine:init', () => {
         Alpine.data('lamp', () => ({
-          modes: ['full','half','square','triangle','grid','circle','lines','scroll_lines','waves','zig','rain','hues','autom','clock','snake','tree','moon','fire','binaryclock','secrings','ray'],
+          modes: ['full','half','square','triangle','grid','circle','lines','scroll_lines','waves','zig','rain','hues','autom','clock','snake','tree','moon','fire','binaryclock','secrings','ray','zap','ripple','vortex','sand','firefly'],
           mode: 'full',
           send(name, val) {
             fetch(`/set?${name}=${val}`).then(r => r.text()).then(console.log);
