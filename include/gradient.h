@@ -6,6 +6,7 @@
 #define GRAD_MIN_R   1.5f
 #define GRAD_MAX_R   5.5f
 #define GRAD_TOTAL_R (GRAD_MIN_R + GRAD_MAX_R)
+#define GRAD_SLOWDOWN 4   // higher = slower gradient movement
 
 static float grad_angle     = 0.0f;
 static float grad_rA        = 3.5f;
@@ -18,9 +19,9 @@ void grad_tick() {
   if (grad_ang_n > 0) {
     grad_angle += grad_ang_v;
     grad_ang_n--;
-  } else if (random(10) == 0) {
-    grad_ang_n = random(5, 20);
-    grad_ang_v = (random(2) ? 1.0f : -1.0f) * (0.02f + random(0, 100) / 100.0f * 0.03f);
+  } else if (random(10 * GRAD_SLOWDOWN) == 0) {
+    grad_ang_n = random(5, 20) * GRAD_SLOWDOWN;
+    grad_ang_v = (random(2) ? 1.0f : -1.0f) * (0.02f + random(0, 100) / 100.0f * 0.03f) / GRAD_SLOWDOWN;
   }
 
   if (grad_r_n > 0) {
@@ -28,9 +29,9 @@ void grad_tick() {
     if (grad_rA > GRAD_MAX_R) grad_rA = GRAD_MAX_R;
     if (grad_rA < GRAD_MIN_R) grad_rA = GRAD_MIN_R;
     grad_r_n--;
-  } else if (random(10) == 0) {
-    grad_r_n = random(5, 20);
-    grad_r_v = (random(2) ? 1.0f : -1.0f) * (0.02f + random(0, 100) / 100.0f * 0.02f);
+  } else if (random(10 * GRAD_SLOWDOWN) == 0) {
+    grad_r_n = random(5, 20) * GRAD_SLOWDOWN;
+    grad_r_v = (random(2) ? 1.0f : -1.0f) * (0.02f + random(0, 100) / 100.0f * 0.02f) / GRAD_SLOWDOWN;
   }
 }
 
